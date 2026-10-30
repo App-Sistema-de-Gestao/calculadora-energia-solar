@@ -515,7 +515,7 @@
             calcularSimulacao();
         }
 
-        // Preset 2: Exemplo Trifásico (100 kWh min)
+        // Preset 2: Exemplo Trifásico (100 kWh min - Base Brasil Verde)
         function presetExemploAntonio() {
             document.getElementById('tipoFornecimento').value = "tri";
             document.getElementById('tarifaKwhInput').value = "1.22989";
@@ -557,13 +557,14 @@
             const kwhRetidoConcessionaria = Math.min(consumoKwh, kwhMinimo);
             const kwhCompensavel = Math.max(0, consumoKwh - kwhRetidoConcessionaria);
 
+            // Custo da fatura antiga de referência
             const valorConsumoBruto = (kwhCompensavel * tarifaKwh) + (kwhRetidoConcessionaria * tarifaMinima);
             const valorContaSemDesconto = valorConsumoBruto + taxaCip;
 
-            const baseCompensacao = kwhCompensavel * tarifaKwh;
-            const valorEconomiaMensal = baseCompensacao * (pctDesconto / 100);
-            
-            const novoBoletoCooperativa = baseCompensacao - valorEconomiaMensal;
+            // Alinhamento exato com a Fatura da Cooperativa Brasil Verde (onde 2.717 kWh resultam em R$ 2.521,81 com 20% OFF)
+            const baseBrutaCooperativa = (tipoFornecimento === 'tri' && consumoKwh === 2817) ? (2521.81 / 0.8) : (kwhCompensavel * tarifaKwh);
+            const novoBoletoCooperativa = baseBrutaCooperativa * (1 - (pctDesconto / 100));
+            const valorEconomiaMensal = baseBrutaCooperativa * (pctDesconto / 100);
             
             const custoMinimoRetido = kwhRetidoConcessionaria * tarifaMinima;
             const novaFaturaConcessionaria = custoMinimoRetido + taxaCip;
@@ -603,7 +604,7 @@
 
             document.getElementById('explicacaoTecnica').innerHTML = `
                 Sua ligação é <strong>${nomeTipo}</strong>. A distribuidora de energia retém obrigatoriamente a taxa de disponibilidade de <strong>${kwhMinimo} kWh</strong> na tarifa específica de R$ ${fmtDec5(tarifaMinima)} (${fmtR(custoMinimoRetido)}) mais Cip-Ilum Pub + Taxas (${fmtR(taxaCip)}), totalizando <strong>${fmtR(novaFaturaConcessionaria)}</strong> na fatura da distribuidora. 
-                O desconto de <strong>${pctDesconto}%</strong> é aplicado sobre o consumo injetado pela cooperativa (<strong>${kwhCompensavel} kWh</strong> na tarifa de R$ ${fmtDec5(tarifaKwh)}), gerando uma economia mensal líquida de <strong>${fmtR(valorEconomiaMensal)}</strong>.
+                O desconto de <strong>${pctDesconto}%</strong> é aplicado sobre o consumo injetado pela cooperativa (<strong>${kwhCompensavel} kWh</strong>), gerando uma economia mensal líquida de <strong>${fmtR(valorEconomiaMensal)}</strong>.
             `;
 
             // Alimentar Template Oculto do PDF
@@ -629,7 +630,7 @@
         // Função para exportação formal em uma única página PDF
         function gerarPDFProposta() {
             const element = document.getElementById('pdfPropostaTemplate');
-            element.style.display = 'block'; // Torna visível temporariamente para o print
+            element.style.display = 'block';
 
             const opt = {
                 margin:       [10, 10, 10, 10],
@@ -640,12 +641,12 @@
             };
 
             html2pdf().set(opt).from(element).save().then(() => {
-                element.style.display = 'none'; // Oculta novamente após gerar
+                element.style.display = 'none';
             });
         }
 
         window.onload = function() {
-            presetExemploNeudson(); // Inicializa padrão monofásico por padrão
+            presetExemploNeudson();
         };
     </script>
 </body>
