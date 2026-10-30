@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora de Economia - Energia Solar por Assinatura</title>
+    <title>CALC. ENERGIA SOLAR POR ASSINATURA</title>
 
     <!-- PWA Manifest & Icons -->
     <link rel="manifest" href="manifest.json">
@@ -102,7 +102,7 @@
 </head>
 <body class="min-h-screen pb-12">
 
-    <!-- Header / Navbar -->
+    <!-- Header / Navbar Atualizado -->
     <header class="border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <div class="flex items-center space-x-3">
@@ -112,8 +112,9 @@
                     </div>
                 </div>
                 <div>
-                    <h1 class="text-lg font-bold bg-gradient-to-r from-yellow-300 via-emerald-300 to-green-400 bg-clip-text text-transparent">
-                        CALC. ENERGIA SOLAR POR ASSINATURA <span class="text-xs font-normal px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 ml-1">Pro</span>
+                    <h1 class="text-base sm:text-lg font-bold bg-gradient-to-r from-yellow-300 via-emerald-300 to-green-400 bg-clip-text text-transparent flex items-center gap-2">
+                        CALC. ENERGIA SOLAR POR ASSINATURA 
+                        <span class="text-xs font-normal px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Pro</span>
                     </h1>
                     <p class="text-xs text-slate-400">Simulador de Economia Solar por Assinatura</p>
                 </div>
@@ -155,41 +156,28 @@
                             <span class="text-xs text-slate-400 bg-slate-900 px-2.5 py-1 rounded-md border border-slate-800">Passo 1 de 2</span>
                         </div>
                         
-                        <!-- Atalhos de Exemplo movidos para dentro do Card -->
-                        <div class="grid grid-cols-2 gap-2 pt-1">
-                            <button type="button" onclick="presetExemploNeudson()" class="text-xs font-semibold py-2 px-3 rounded-xl bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/20 transition flex items-center justify-center gap-1.5">
-                                <i class="fa-solid fa-house-user text-emerald-400"></i> Exemplo Monofásico
+                        <!-- Botões Superiores com as informações de Monofásico (30 kWh min) e Trifásico (100 kWh min) -->
+                        <div class="grid grid-cols-2 gap-2.5 pt-1">
+                            <button type="button" id="btnMono" onclick="presetExemploNeudson()" class="p-2.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 transition text-left">
+                                <div class="text-xs font-bold flex items-center gap-1.5">
+                                    <i class="fa-solid fa-house-user text-emerald-400"></i> Exemplo Monofásico
+                                </div>
+                                <div class="text-[10px] text-emerald-400/80 mt-0.5">30 kWh min</div>
                             </button>
-                            <button type="button" onclick="presetExemploAntonio()" class="text-xs font-semibold py-2 px-3 rounded-xl bg-yellow-500/10 text-yellow-300 border border-yellow-500/30 hover:bg-yellow-500/20 transition flex items-center justify-center gap-1.5">
-                                <i class="fa-solid fa-bolt text-yellow-400"></i> Exemplo Trifásico
+
+                            <button type="button" id="btnTri" onclick="presetExemploAntonio()" class="p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 text-slate-300 hover:border-yellow-400/50 hover:text-yellow-300 transition text-left">
+                                <div class="text-xs font-bold flex items-center gap-1.5">
+                                    <i class="fa-solid fa-bolt text-yellow-400"></i> Exemplo Trifásico
+                                </div>
+                                <div class="text-[10px] text-slate-400 mt-0.5">100 kWh min</div>
                             </button>
                         </div>
                     </div>
 
                     <form id="solarForm" onsubmit="return false;" class="mt-6 space-y-5">
                         
-                        <!-- Padrão (Sem Bifásico) -->
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
-                                Tipo de Padrão / Concessionária
-                            </label>
-                            <div class="grid grid-cols-2 gap-3">
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="tipoFornecimento" value="mono" checked onchange="calcularSimulacao()" class="peer sr-only">
-                                    <div class="p-3 text-center rounded-xl border border-slate-800 bg-slate-950/60 peer-checked:border-yellow-400 peer-checked:bg-yellow-500/10 peer-checked:text-yellow-300 hover:border-slate-700 transition">
-                                        <div class="text-xs font-bold">Monofásico</div>
-                                        <div class="text-[10px] text-slate-400 mt-0.5">30 kWh min</div>
-                                    </div>
-                                </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="tipoFornecimento" value="tri" onchange="calcularSimulacao()" class="peer sr-only">
-                                    <div class="p-3 text-center rounded-xl border border-slate-800 bg-slate-950/60 peer-checked:border-yellow-400 peer-checked:bg-yellow-500/10 peer-checked:text-yellow-300 hover:border-slate-700 transition">
-                                        <div class="text-xs font-bold">Trifásico</div>
-                                        <div class="text-[10px] text-slate-400 mt-0.5">100 kWh min</div>
-                                    </div>
-                                </label>
-                            </div>
-                        </div>
+                        <!-- Campo oculto para controle lógico do padrão selecionado -->
+                        <input type="hidden" id="tipoFornecimento" value="mono">
 
                         <!-- Tarifa Consumo kWh (5 casas decimais) -->
                         <div>
@@ -236,7 +224,7 @@
                             </div>
                         </div>
 
-                        <!-- CIP e Taxas Renomeado -->
+                        <!-- CIP e Taxas -->
                         <div>
                             <div class="flex justify-between items-center mb-1.5">
                                 <label for="taxaCip" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
@@ -246,7 +234,7 @@
                             </div>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm font-semibold">R$</span>
-                                <input type="number" id="taxaCip" value="31.46" step="0.01" min="0" oninput="calcularSimulacao()" 
+                                <input type="number" id="taxaCip" value="38.61" step="0.01" min="0" oninput="calcularSimulacao()" 
                                        class="custom-input w-full pl-10 pr-4 py-2.5 rounded-xl text-base font-semibold text-slate-200 focus:outline-none" placeholder="0,00">
                             </div>
                         </div>
@@ -411,26 +399,36 @@
             });
         }
 
-        // Preset 1: Exemplo Monofásico
+        // Preset 1: Exemplo Monofásico (30 kWh min)
         function presetExemploNeudson() {
-            document.querySelectorAll('input[name="tipoFornecimento"]')[0].checked = true;
+            document.getElementById('tipoFornecimento').value = "mono";
             document.getElementById('tarifaKwhInput').value = "1.22989";
             document.getElementById('tarifaMinimaInput').value = "0.94633";
             document.getElementById('consumoKwh').value = "588";
-            document.getElementById('taxaCip').value = "31.46";
+            document.getElementById('taxaCip').value = "38.61";
             document.getElementById('pctDesconto').value = "20";
+
+            // Visual dos botões
+            document.getElementById('btnMono').className = "p-2.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 transition text-left";
+            document.getElementById('btnTri').className = "p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 text-slate-300 hover:border-yellow-400/50 hover:text-yellow-300 transition text-left";
+
             atualizarDescontoLabel();
             calcularSimulacao();
         }
 
-        // Preset 2: Exemplo Trifásico
+        // Preset 2: Exemplo Trifásico (100 kWh min)
         function presetExemploAntonio() {
-            document.querySelectorAll('input[name="tipoFornecimento"]')[1].checked = true;
-            document.getElementById('tarifaKwhInput').value = "1.16000";
-            document.getElementById('tarifaMinimaInput').value = "1.16000";
+            document.getElementById('tipoFornecimento').value = "tri";
+            document.getElementById('tarifaKwhInput').value = "1.22989";
+            document.getElementById('tarifaMinimaInput').value = "1.16020";
             document.getElementById('consumoKwh').value = "2817";
-            document.getElementById('taxaCip').value = "0.00"; 
+            document.getElementById('taxaCip').value = "405.42"; 
             document.getElementById('pctDesconto').value = "20";
+
+            // Visual dos botões
+            document.getElementById('btnTri').className = "p-2.5 rounded-xl border border-yellow-400/50 bg-yellow-500/10 text-yellow-300 hover:bg-yellow-500/20 transition text-left";
+            document.getElementById('btnMono').className = "p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 text-slate-300 hover:border-emerald-500/50 hover:text-emerald-300 transition text-left";
+
             atualizarDescontoLabel();
             calcularSimulacao();
         }
@@ -447,11 +445,11 @@
             const taxaCip = parseFloat(document.getElementById('taxaCip').value) || 0;
             const pctDesconto = parseFloat(document.getElementById('pctDesconto').value) || 20;
 
-            const tipoFornecimentoEl = document.querySelector('input[name="tipoFornecimento"]:checked');
+            const tipoFornecimento = document.getElementById('tipoFornecimento').value;
             let kwhMinimo = 30;
             let nomeTipo = "Monofásico";
 
-            if (tipoFornecimentoEl && tipoFornecimentoEl.value === 'tri') {
+            if (tipoFornecimento === 'tri') {
                 kwhMinimo = 100;
                 nomeTipo = "Trifásico";
             }
@@ -461,17 +459,16 @@
             const kwhRetidoConcessionaria = Math.min(consumoKwh, kwhMinimo);
             const kwhCompensavel = Math.max(0, consumoKwh - kwhRetidoConcessionaria);
 
-            // Custo da fatura antiga de referência
+            // Custo da fatura antiga de referência proporcional correta
             const valorConsumoBruto = (kwhCompensavel * tarifaKwh) + (kwhRetidoConcessionaria * tarifaMinima);
             const valorContaSemDesconto = valorConsumoBruto + taxaCip;
 
-            // Cálculos da nova estrutura
-            const valorEnergiaCompensavelSemDesconto = kwhCompensavel * tarifaKwh;
-            const valorEconomiaMensal = valorEnergiaCompensavelSemDesconto * (pctDesconto / 100);
+            // Recálculo com o desconto aplicado
+            const baseCompensacao = kwhCompensavel * tarifaKwh;
+            const valorEconomiaMensal = baseCompensacao * (pctDesconto / 100);
             
-            const novoBoletoCooperativa = valorEnergiaCompensavelSemDesconto - valorEconomiaMensal;
+            const novoBoletoCooperativa = baseCompensacao - valorEconomiaMensal;
             
-            // Fatura da concessionária utilizando a tarifa específica da taxa mínima
             const custoMinimoRetido = kwhRetidoConcessionaria * tarifaMinima;
             const novaFaturaConcessionaria = custoMinimoRetido + taxaCip;
             const novoCustoTotalCombinado = novaFaturaConcessionaria + novoBoletoCooperativa;
@@ -529,7 +526,7 @@
         }
 
         window.onload = function() {
-            calcularSimulacao();
+            presetExemploNeudson(); // Inicializa padrão monofásico por padrão
         };
     </script>
 </body>
