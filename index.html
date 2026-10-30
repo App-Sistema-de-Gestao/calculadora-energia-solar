@@ -17,6 +17,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- html2pdf Library para exportação limpa de proposta em PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <script>
         tailwind.config = {
@@ -117,19 +119,16 @@
                 </div>
             </div>
             
-            <div class="flex items-center space-x-2">
-                <button onclick="presetExemploAntonio()" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-yellow-500/10 text-yellow-300 border border-yellow-500/30 hover:bg-yellow-500/20 transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-bolt text-yellow-400"></i> Exemplo Trifásico
-                </button>
-                <button onclick="presetExemploNeudson()" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/20 transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-house-user text-emerald-400"></i> Exemplo Monofásico
+            <div>
+                <button onclick="gerarPDFProposta()" class="text-xs font-bold px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20 hover:from-emerald-400 hover:to-teal-500 transition flex items-center gap-2">
+                    <i class="fa-solid fa-file-pdf text-sm"></i> Baixar Proposta (PDF)
                 </button>
             </div>
         </div>
     </header>
 
     <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8" id="conteudoProposta">
 
         <div class="text-center max-w-3xl mx-auto mb-10">
             <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
@@ -147,32 +146,39 @@
                 <div class="glass-panel neon-card rounded-2xl p-6 sm:p-7 border border-slate-800 relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-32 h-32 bg-yellow-500/5 rounded-full blur-2xl pointer-events-none"></div>
 
-                    <div class="flex items-center justify-between pb-5 border-b border-slate-800">
-                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                            <i class="fa-solid fa-sliders text-yellow-400"></i> Dados da Fatura Atual
-                        </h3>
-                        <span class="text-xs text-slate-400 bg-slate-900 px-2.5 py-1 rounded-md border border-slate-800">Passo 1 de 2</span>
+                    <!-- Header do Card com Botões de Atalhos Integrados -->
+                    <div class="pb-5 border-b border-slate-800 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-sliders text-yellow-400"></i> Dados da Fatura Atual
+                            </h3>
+                            <span class="text-xs text-slate-400 bg-slate-900 px-2.5 py-1 rounded-md border border-slate-800">Passo 1 de 2</span>
+                        </div>
+                        
+                        <!-- Atalhos de Exemplo movidos para dentro do Card -->
+                        <div class="grid grid-cols-2 gap-2 pt-1">
+                            <button type="button" onclick="presetExemploNeudson()" class="text-xs font-semibold py-2 px-3 rounded-xl bg-emerald-500/10 text-emerald-300 border border-emerald-500/30 hover:bg-emerald-500/20 transition flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-house-user text-emerald-400"></i> Exemplo Monofásico
+                            </button>
+                            <button type="button" onclick="presetExemploAntonio()" class="text-xs font-semibold py-2 px-3 rounded-xl bg-yellow-500/10 text-yellow-300 border border-yellow-500/30 hover:bg-yellow-500/20 transition flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-bolt text-yellow-400"></i> Exemplo Trifásico
+                            </button>
+                        </div>
                     </div>
 
                     <form id="solarForm" onsubmit="return false;" class="mt-6 space-y-5">
                         
+                        <!-- Padrão (Sem Bifásico) -->
                         <div>
                             <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
                                 Tipo de Padrão / Concessionária
                             </label>
-                            <div class="grid grid-cols-3 gap-2">
+                            <div class="grid grid-cols-2 gap-3">
                                 <label class="cursor-pointer">
                                     <input type="radio" name="tipoFornecimento" value="mono" checked onchange="calcularSimulacao()" class="peer sr-only">
                                     <div class="p-3 text-center rounded-xl border border-slate-800 bg-slate-950/60 peer-checked:border-yellow-400 peer-checked:bg-yellow-500/10 peer-checked:text-yellow-300 hover:border-slate-700 transition">
                                         <div class="text-xs font-bold">Monofásico</div>
                                         <div class="text-[10px] text-slate-400 mt-0.5">30 kWh min</div>
-                                    </div>
-                                </label>
-                                <label class="cursor-pointer">
-                                    <input type="radio" name="tipoFornecimento" value="bi" onchange="calcularSimulacao()" class="peer sr-only">
-                                    <div class="p-3 text-center rounded-xl border border-slate-800 bg-slate-950/60 peer-checked:border-yellow-400 peer-checked:bg-yellow-500/10 peer-checked:text-yellow-300 hover:border-slate-700 transition">
-                                        <div class="text-xs font-bold">Bifásico</div>
-                                        <div class="text-[10px] text-slate-400 mt-0.5">50 kWh min</div>
                                     </div>
                                 </label>
                                 <label class="cursor-pointer">
@@ -185,12 +191,13 @@
                             </div>
                         </div>
 
+                        <!-- Tarifa Consumo kWh (5 casas decimais) -->
                         <div>
                             <div class="flex justify-between items-center mb-1.5">
                                 <label for="tarifaKwhInput" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                                    Tarifa do kWh (R$)
+                                    Tarifa do kWh Consumo (R$)
                                 </label>
-                                <span class="text-[11px] text-slate-400">Tarifa de consumo</span>
+                                <span class="text-[11px] text-slate-400">Tarifa cheia</span>
                             </div>
                             <div class="relative">
                                 <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm font-semibold">R$</span>
@@ -199,6 +206,22 @@
                             </div>
                         </div>
 
+                        <!-- Tarifa Taxa Mínima / Disponibilidade (5 casas decimais) -->
+                        <div>
+                            <div class="flex justify-between items-center mb-1.5">
+                                <label for="tarifaMinimaInput" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                                    Tarifa da Taxa Mínima (R$/kWh)
+                                </label>
+                                <span class="text-[11px] text-slate-400">Disponibilidade</span>
+                            </div>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm font-semibold">R$</span>
+                                <input type="number" id="tarifaMinimaInput" value="0.94633" step="0.00001" min="0" oninput="calcularSimulacao()" 
+                                       class="custom-input w-full pl-10 pr-4 py-2.5 rounded-xl text-base font-semibold text-slate-200 focus:outline-none" placeholder="0.94633">
+                            </div>
+                        </div>
+
+                        <!-- Consumo Mensal -->
                         <div>
                             <div class="flex justify-between items-center mb-1.5">
                                 <label for="consumoKwh" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
@@ -213,10 +236,11 @@
                             </div>
                         </div>
 
+                        <!-- CIP e Taxas Renomeado -->
                         <div>
                             <div class="flex justify-between items-center mb-1.5">
                                 <label for="taxaCip" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                                    Taxa de Iluminação Pública / CIP (R$)
+                                    Cip-Ilum Pub + Taxas (R$)
                                 </label>
                                 <span class="text-[11px] text-slate-400">Não compensável</span>
                             </div>
@@ -227,6 +251,7 @@
                             </div>
                         </div>
 
+                        <!-- Desconto -->
                         <div>
                             <div class="flex justify-between items-center mb-1.5">
                                 <label for="pctDesconto" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
@@ -261,6 +286,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     
+                    <!-- Cenário Atual -->
                     <div class="glass-panel neon-card rounded-2xl p-5 border border-slate-800 relative">
                         <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
                             <span>Cenário Atual</span>
@@ -279,12 +305,13 @@
                                 <span class="font-medium text-slate-200" id="resTarifaKwh">R$ 0,00</span>
                             </div>
                             <div class="flex justify-between text-slate-400">
-                                <span>Taxas + CIP:</span>
+                                <span>Cip-Ilum Pub + Taxas:</span>
                                 <span class="font-medium text-slate-200" id="resTaxaAntiga">R$ 0,00</span>
                             </div>
                         </div>
                     </div>
 
+                    <!-- Novo Custo Combinado -->
                     <div class="glass-panel neon-card rounded-2xl p-5 border border-emerald-500/40 bg-gradient-to-br from-slate-900/90 to-emerald-950/20 relative overflow-hidden">
                         <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl pointer-events-none"></div>
 
@@ -301,7 +328,7 @@
                             <div class="flex justify-between items-center p-2 rounded-lg bg-slate-950/50 border border-slate-800">
                                 <div>
                                     <span class="block font-medium text-slate-300">1. Fatura Concessionária</span>
-                                    <span class="text-[10px] text-slate-400" id="resMinimoLabel">(30 kWh min + CIP)</span>
+                                    <span class="text-[10px] text-slate-400" id="resMinimoLabel">(30 kWh retidos + Cip-Ilum Pub + Taxas)</span>
                                 </div>
                                 <span class="font-bold text-slate-200" id="resFaturaConcessionaria">R$ 0,00</span>
                             </div>
@@ -376,18 +403,19 @@
 
     </main>
 
-    <!-- JavaScript Logic & PWA Service Worker Registration -->
+    <!-- JavaScript Logic -->
     <script>
-        // Registrar Service Worker para permitir instalação do PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed: ', err));
             });
         }
 
+        // Preset 1: Exemplo Monofásico
         function presetExemploNeudson() {
             document.querySelectorAll('input[name="tipoFornecimento"]')[0].checked = true;
             document.getElementById('tarifaKwhInput').value = "1.22989";
+            document.getElementById('tarifaMinimaInput').value = "0.94633";
             document.getElementById('consumoKwh').value = "588";
             document.getElementById('taxaCip').value = "31.46";
             document.getElementById('pctDesconto').value = "20";
@@ -395,9 +423,11 @@
             calcularSimulacao();
         }
 
+        // Preset 2: Exemplo Trifásico
         function presetExemploAntonio() {
-            document.querySelectorAll('input[name="tipoFornecimento"]')[2].checked = true;
+            document.querySelectorAll('input[name="tipoFornecimento"]')[1].checked = true;
             document.getElementById('tarifaKwhInput').value = "1.16000";
+            document.getElementById('tarifaMinimaInput').value = "1.16000";
             document.getElementById('consumoKwh').value = "2817";
             document.getElementById('taxaCip').value = "0.00"; 
             document.getElementById('pctDesconto').value = "20";
@@ -412,6 +442,7 @@
 
         function calcularSimulacao() {
             const tarifaKwh = parseFloat(document.getElementById('tarifaKwhInput').value) || 0;
+            const tarifaMinima = parseFloat(document.getElementById('tarifaMinimaInput').value) || 0;
             const consumoKwh = parseFloat(document.getElementById('consumoKwh').value) || 0;
             const taxaCip = parseFloat(document.getElementById('taxaCip').value) || 0;
             const pctDesconto = parseFloat(document.getElementById('pctDesconto').value) || 20;
@@ -420,29 +451,29 @@
             let kwhMinimo = 30;
             let nomeTipo = "Monofásico";
 
-            if (tipoFornecimentoEl) {
-                if (tipoFornecimentoEl.value === 'bi') {
-                    kwhMinimo = 50;
-                    nomeTipo = "Bifásico";
-                } else if (tipoFornecimentoEl.value === 'tri') {
-                    kwhMinimo = 100;
-                    nomeTipo = "Trifásico";
-                }
+            if (tipoFornecimentoEl && tipoFornecimentoEl.value === 'tri') {
+                kwhMinimo = 100;
+                nomeTipo = "Trifásico";
             }
 
             if (consumoKwh <= 0 || tarifaKwh <= 0) return;
 
-            const valorConsumoBruto = consumoKwh * tarifaKwh;
-            const valorContaSemDesconto = valorConsumoBruto + taxaCip;
-
             const kwhRetidoConcessionaria = Math.min(consumoKwh, kwhMinimo);
             const kwhCompensavel = Math.max(0, consumoKwh - kwhRetidoConcessionaria);
 
+            // Custo da fatura antiga de referência
+            const valorConsumoBruto = (kwhCompensavel * tarifaKwh) + (kwhRetidoConcessionaria * tarifaMinima);
+            const valorContaSemDesconto = valorConsumoBruto + taxaCip;
+
+            // Cálculos da nova estrutura
             const valorEnergiaCompensavelSemDesconto = kwhCompensavel * tarifaKwh;
             const valorEconomiaMensal = valorEnergiaCompensavelSemDesconto * (pctDesconto / 100);
             
             const novoBoletoCooperativa = valorEnergiaCompensavelSemDesconto - valorEconomiaMensal;
-            const novaFaturaConcessionaria = (kwhRetidoConcessionaria * tarifaKwh) + taxaCip;
+            
+            // Fatura da concessionária utilizando a tarifa específica da taxa mínima
+            const custoMinimoRetido = kwhRetidoConcessionaria * tarifaMinima;
+            const novaFaturaConcessionaria = custoMinimoRetido + taxaCip;
             const novoCustoTotalCombinado = novaFaturaConcessionaria + novoBoletoCooperativa;
 
             const pctRealGlobal = (valorContaSemDesconto > 0) ? ((valorContaSemDesconto - novoCustoTotalCombinado) / valorContaSemDesconto) * 100 : 0;
@@ -453,17 +484,19 @@
             const economia10Anos = economiaAnual * 10;
 
             const fmtR = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            const fmtDec5 = (v) => v.toLocaleString('pt-BR', { minimumFractionDigits: 5, maximumFractionDigits: 5 });
 
+            // Atualização no DOM
             document.getElementById('resContaAntiga').innerText = fmtR(valorContaSemDesconto);
             document.getElementById('resConsumoTotal').innerText = consumoKwh + ' kWh';
-            document.getElementById('resTarifaKwh').innerText = fmtR(tarifaKwh) + ' / kWh';
+            document.getElementById('resTarifaKwh').innerText = 'R$ ' + fmtDec5(tarifaKwh) + ' / kWh';
             document.getElementById('resTaxaAntiga').innerText = fmtR(taxaCip);
 
             document.getElementById('resNovoCustoTotal').innerText = fmtR(novoCustoTotalCombinado);
             document.getElementById('resFaturaConcessionaria').innerText = fmtR(novaFaturaConcessionaria);
             document.getElementById('resBoletoCooperativa').innerText = fmtR(novoBoletoCooperativa);
 
-            document.getElementById('resMinimoLabel').innerText = `(${kwhRetidoConcessionaria} kWh retidos + CIP)`;
+            document.getElementById('resMinimoLabel').innerText = `(${kwhRetidoConcessionaria} kWh a R$ ${fmtDec5(tarifaMinima)} + Cip-Ilum Pub + Taxas = ${fmtR(novaFaturaConcessionaria)})`;
             document.getElementById('resCompensadoLabel').innerText = `(${kwhCompensavel} kWh com ${pctDesconto}% OFF)`;
 
             document.getElementById('resEconomiaMensal').innerText = fmtR(valorEconomiaMensal);
@@ -476,9 +509,23 @@
             document.getElementById('proj10Anos').innerText = fmtR(economia10Anos);
 
             document.getElementById('explicacaoTecnica').innerHTML = `
-                Sua ligação é <strong>${nomeTipo}</strong>. A distribuidora de energia retém obrigatoriamente a taxa de disponibilidade de <strong>${kwhMinimo} kWh</strong> (${fmtR(kwhRetidoConcessionaria * tarifaKwh)}) mais a taxa de Iluminação Pública (${fmtR(taxaCip)}). 
-                O desconto de <strong>${pctDesconto}%</strong> é aplicado exclusivamente sobre a energia solar injetada pela cooperativa (<strong>${kwhCompensavel} kWh</strong>), gerando uma economia mensal líquida de <strong>${fmtR(valorEconomiaMensal)}</strong>.
+                Sua ligação é <strong>${nomeTipo}</strong>. A distribuidora de energia retém obrigatoriamente a taxa de disponibilidade de <strong>${kwhMinimo} kWh</strong> na tarifa específica de R$ ${fmtDec5(tarifaMinima)} (${fmtR(custoMinimoRetido)}) mais Cip-Ilum Pub + Taxas (${fmtR(taxaCip)}), totalizando <strong>${fmtR(novaFaturaConcessionaria)}</strong> na fatura da distribuidora. 
+                O desconto de <strong>${pctDesconto}%</strong> é aplicado sobre o consumo injetado pela cooperativa (<strong>${kwhCompensavel} kWh</strong> na tarifa de R$ ${fmtDec5(tarifaKwh)}), gerando uma economia mensal líquida de <strong>${fmtR(valorEconomiaMensal)}</strong>.
             `;
+        }
+
+        // Função para exportação limpa da proposta em PDF
+        function gerarPDFProposta() {
+            const element = document.getElementById('conteudoProposta');
+            const opt = {
+                margin:       [10, 10, 10, 10],
+                filename:     'Proposta_Economia_Solar.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { scale: 2, backgroundColor: '#080C14' },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            html2pdf().set(opt).from(element).save();
         }
 
         window.onload = function() {
