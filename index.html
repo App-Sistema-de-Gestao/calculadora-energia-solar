@@ -1,653 +1,597 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CALC. ENERGIA SOLAR POR ASSINATURA</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CALC. ENERGIA SOLAR POR ASSINATURA (Pro)</title>
+  
+  <!-- PWA & Mobile Icons -->
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0d1117">
+  
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- html2pdf for clean commercial PDF output -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-    <!-- PWA Manifest & Icons -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0B0F17">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
-
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- html2pdf Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            dark: '#0B0F17',
-                            card: '#131B2E',
-                            border: '#1E293B',
-                            green: '#10B981',
-                            greenNeon: '#00FF87',
-                            yellow: '#FACC15',
-                            yellowNeon: '#FFE600',
-                            gold: '#EAB308'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-
-    <style>
-        body {
-            background-color: #080C14;
-            color: #F8FAFC;
-            font-family: 'Inter', sans-serif;
-            background-image: 
-                radial-gradient(circle at 15% 15%, rgba(16, 185, 129, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 85% 85%, rgba(250, 204, 21, 0.06) 0%, transparent 40%);
-            background-attachment: fixed;
-        }
-
-        .glass-panel {
-            background: rgba(19, 27, 46, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .neon-card {
-            transition: all 0.3s ease;
-        }
-        .neon-card:hover, .neon-card:focus-within, .neon-card.active-card {
-            border-color: #FACC15 !important;
-            box-shadow: 0 0 20px rgba(250, 204, 21, 0.35), inset 0 0 10px rgba(250, 204, 21, 0.05);
-            transform: translateY(-2px);
-        }
-
-        .custom-input {
-            background: rgba(11, 15, 23, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            color: #F8FAFC;
-            transition: all 0.2s ease;
-        }
-        .custom-input:focus {
-            border-color: #FACC15;
-            box-shadow: 0 0 10px rgba(250, 204, 21, 0.25);
-            outline: none;
-        }
-
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #080C14;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #1E293B;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #10B981;
-        }
-    </style>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0b0f17;
+      color: #e2e8f0;
+    }
+    .neon-border {
+      box-shadow: 0 0 15px rgba(6, 182, 212, 0.15);
+    }
+    .neon-border-active {
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.35);
+      border-color: #06b6d4 !important;
+    }
+    /* Estilos do PDF Comercial */
+    #pdf-template {
+      display: none;
+    }
+    .pdf-page {
+      width: 210mm;
+      min-height: 297mm;
+      padding: 15mm;
+      background: #ffffff;
+      color: #1e293b;
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
 </head>
-<body class="min-h-screen pb-12">
+<body class="min-h-screen flex flex-col justify-between">
 
-    <!-- Header / Navbar -->
-    <header class="border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-yellow-500 via-emerald-500 to-green-400 p-0.5 flex items-center justify-center shadow-lg shadow-yellow-500/10">
-                    <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-                        <i class="fa-solid fa-sun text-yellow-400 text-xl animate-pulse"></i>
-                    </div>
-                </div>
-                <div>
-                    <h1 class="text-base sm:text-lg font-bold bg-gradient-to-r from-yellow-300 via-emerald-300 to-green-400 bg-clip-text text-transparent flex items-center gap-2">
-                        CALC. ENERGIA SOLAR POR ASSINATURA 
-                        <span class="text-xs font-normal px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Pro</span>
-                    </h1>
-                    <p class="text-xs text-slate-400">Simulador de Economia Solar por Assinatura</p>
-                </div>
-            </div>
-            
-            <div>
-                <button onclick="gerarPDFProposta()" class="text-xs font-bold px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/20 hover:from-emerald-400 hover:to-teal-500 transition flex items-center gap-2">
-                    <i class="fa-solid fa-file-pdf text-sm"></i> Baixar Proposta (PDF)
-                </button>
-            </div>
+  <!-- Header -->
+  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur-md sticky top-0 z-50 px-4 py-3">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="p-2 bg-cyan-500/10 text-cyan-400 rounded-lg border border-cyan-500/20">
+          <i data-lucide="zap" class="w-6 h-6"></i>
         </div>
-    </header>
-
-    <!-- Main Container -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-
-        <div class="text-center max-w-3xl mx-auto mb-10">
-            <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-                Calcule sua <span class="text-emerald-400 underline decoration-yellow-400/80 decoration-2 underline-offset-8">Economia Real</span> na Fatura
-            </h2>
-            <p class="mt-3 text-slate-400 text-sm sm:text-base">
-                Transparência total: veja exatamente o valor abatido do seu consumo e o saldo final combinando a concessionária e a cooperativa.
-            </p>
+        <div>
+          <h1 class="font-bold text-lg text-slate-100 flex items-center gap-2">
+            CALC. ENERGIA SOLAR POR ASSINATURA 
+            <span class="text-xs font-semibold px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded">Pro</span>
+          </h1>
+          <p class="text-xs text-slate-400">Simulador de Economia Líquida por Assinatura</p>
         </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="resetDefaults()" class="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-xs text-slate-400 hover:text-slate-200 bg-slate-800/80 rounded-lg border border-slate-700 transition">
+          <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Restaurar Padrão
+        </button>
+        <button onclick="generatePDF()" class="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-semibold text-xs rounded-lg transition shadow-lg shadow-emerald-500/20">
+          <i data-lucide="file-text" class="w-4 h-4"></i> Baixar Proposta (PDF)
+        </button>
+      </div>
+    </div>
+  </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-
-            <!-- LEFT COLUMN: INPUT FORM -->
-            <div class="lg:col-span-5 space-y-6">
-                <div class="glass-panel neon-card rounded-2xl p-6 sm:p-7 border border-slate-800 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-yellow-500/5 rounded-full blur-2xl pointer-events-none"></div>
-
-                    <!-- Header do Card com Botões de Atalhos Integrados -->
-                    <div class="pb-5 border-b border-slate-800 space-y-3">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                                <i class="fa-solid fa-sliders text-yellow-400"></i> Dados da Fatura Atual
-                            </h3>
-                            <span class="text-xs text-slate-400 bg-slate-900 px-2.5 py-1 rounded-md border border-slate-800">Passo 1 de 2</span>
-                        </div>
-                        
-                        <!-- Botões Superiores com as informações de Monofásico (30 kWh min) e Trifásico (100 kWh min) -->
-                        <div class="grid grid-cols-2 gap-2.5 pt-1">
-                            <button type="button" id="btnMono" onclick="presetExemploNeudson()" class="p-2.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 transition text-left">
-                                <div class="text-xs font-bold flex items-center gap-1.5">
-                                    <i class="fa-solid fa-house-user text-emerald-400"></i> Exemplo Monofásico
-                                </div>
-                                <div class="text-[10px] text-emerald-400/80 mt-0.5">30 kWh min</div>
-                            </button>
-
-                            <button type="button" id="btnTri" onclick="presetExemploAntonio()" class="p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 text-slate-300 hover:border-yellow-400/50 hover:text-yellow-300 transition text-left">
-                                <div class="text-xs font-bold flex items-center gap-1.5">
-                                    <i class="fa-solid fa-bolt text-yellow-400"></i> Exemplo Trifásico
-                                </div>
-                                <div class="text-[10px] text-slate-400 mt-0.5">100 kWh min</div>
-                            </button>
-                        </div>
-                    </div>
-
-                    <form id="solarForm" onsubmit="return false;" class="mt-6 space-y-5">
-                        
-                        <!-- Campo oculto para controle lógico do padrão selecionado -->
-                        <input type="hidden" id="tipoFornecimento" value="mono">
-
-                        <!-- Tarifa Consumo kWh (5 casas decimais) -->
-                        <div>
-                            <div class="flex justify-between items-center mb-1.5">
-                                <label for="tarifaKwhInput" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                                    Tarifa do kWh Consumo (R$)
-                                </label>
-                                <span class="text-[11px] text-slate-400">Tarifa cheia</span>
-                            </div>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm font-semibold">R$</span>
-                                <input type="number" id="tarifaKwhInput" value="1.22989" step="0.00001" min="0.1" oninput="calcularSimulacao()" 
-                                       class="custom-input w-full pl-10 pr-4 py-2.5 rounded-xl text-base font-semibold text-slate-200 focus:outline-none" placeholder="1.22989">
-                            </div>
-                        </div>
-
-                        <!-- Tarifa Taxa Mínima / Disponibilidade (5 casas decimais) -->
-                        <div>
-                            <div class="flex justify-between items-center mb-1.5">
-                                <label for="tarifaMinimaInput" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                                    Tarifa da Taxa Mínima (R$/kWh)
-                                </label>
-                                <span class="text-[11px] text-slate-400">Disponibilidade</span>
-                            </div>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm font-semibold">R$</span>
-                                <input type="number" id="tarifaMinimaInput" value="0.94633" step="0.00001" min="0" oninput="calcularSimulacao()" 
-                                       class="custom-input w-full pl-10 pr-4 py-2.5 rounded-xl text-base font-semibold text-slate-200 focus:outline-none" placeholder="0.94633">
-                            </div>
-                        </div>
-
-                        <!-- Consumo Mensal -->
-                        <div>
-                            <div class="flex justify-between items-center mb-1.5">
-                                <label for="consumoKwh" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                                    Consumo Mensal (kWh)
-                                </label>
-                                <span class="text-[11px] text-slate-400">Medido na fatura</span>
-                            </div>
-                            <div class="relative">
-                                <input type="number" id="consumoKwh" value="588" step="1" min="1" oninput="calcularSimulacao()" 
-                                       class="custom-input w-full px-4 py-3 rounded-xl text-lg font-bold text-white focus:outline-none" placeholder="0">
-                                <span class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 text-sm font-semibold">kWh</span>
-                            </div>
-                        </div>
-
-                        <!-- CIP e Taxas -->
-                        <div>
-                            <div class="flex justify-between items-center mb-1.5">
-                                <label for="taxaCip" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                                    Cip-Ilum Pub + Taxas (R$)
-                                </label>
-                                <span class="text-[11px] text-slate-400">Não compensável</span>
-                            </div>
-                            <div class="relative">
-                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-400 text-sm font-semibold">R$</span>
-                                <input type="number" id="taxaCip" value="38.61" step="0.01" min="0" oninput="calcularSimulacao()" 
-                                       class="custom-input w-full pl-10 pr-4 py-2.5 rounded-xl text-base font-semibold text-slate-200 focus:outline-none" placeholder="0,00">
-                            </div>
-                        </div>
-
-                        <!-- Desconto -->
-                        <div>
-                            <div class="flex justify-between items-center mb-1.5">
-                                <label for="pctDesconto" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                                    Desconto no Consumo (%)
-                                </label>
-                                <span id="pctDescontoVal" class="text-xs font-bold text-yellow-400">20%</span>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <input type="range" id="pctDesconto" min="5" max="30" value="20" step="1" oninput="atualizarDescontoLabel(); calcularSimulacao();" 
-                                       class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-yellow-400">
-                            </div>
-                        </div>
-
-                    </form>
-                </div>
-
-                <div class="glass-panel rounded-2xl p-5 border border-emerald-500/20 bg-emerald-950/10">
-                    <div class="flex gap-3">
-                        <div class="text-emerald-400 text-lg pt-0.5">
-                            <i class="fa-solid fa-circle-check"></i>
-                        </div>
-                        <div class="text-xs text-slate-300 leading-relaxed">
-                            <strong class="text-emerald-300 font-semibold block mb-1">Sem Fidelidade ou Multas Ocultas:</strong>
-                            A adesão não exige obras no seu imóvel. Você continua recebendo a energia com a mesma confiabilidade da distribuidora local.
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- RIGHT COLUMN: RESULTS -->
-            <div class="lg:col-span-7 space-y-6">
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    
-                    <!-- Cenário Atual -->
-                    <div class="glass-panel neon-card rounded-2xl p-5 border border-slate-800 relative">
-                        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
-                            <span>Cenário Atual</span>
-                            <i class="fa-solid fa-building-flag text-slate-500"></i>
-                        </div>
-                        <div class="text-2xl font-extrabold text-slate-300" id="resContaAntiga">R$ 0,00</div>
-                        <div class="text-xs text-slate-400 mt-1 pb-4 border-b border-slate-800">100% Pago à Concessionária</div>
-
-                        <div class="mt-4 space-y-2 text-xs">
-                            <div class="flex justify-between text-slate-400">
-                                <span>Consumo Total:</span>
-                                <span class="font-medium text-slate-200" id="resConsumoTotal">0 kWh</span>
-                            </div>
-                            <div class="flex justify-between text-slate-400">
-                                <span>Tarifa do kWh:</span>
-                                <span class="font-medium text-slate-200" id="resTarifaKwh">R$ 0,00</span>
-                            </div>
-                            <div class="flex justify-between text-slate-400">
-                                <span>Cip-Ilum Pub + Taxas:</span>
-                                <span class="font-medium text-slate-200" id="resTaxaAntiga">R$ 0,00</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Novo Custo Combinado -->
-                    <div class="glass-panel neon-card rounded-2xl p-5 border border-emerald-500/40 bg-gradient-to-br from-slate-900/90 to-emerald-950/20 relative overflow-hidden">
-                        <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl pointer-events-none"></div>
-
-                        <div class="text-xs font-semibold text-emerald-400 uppercase tracking-wider mb-2 flex items-center justify-between">
-                            <span>Novo Custo Combinado</span>
-                            <span class="bg-emerald-500/20 text-emerald-300 text-[10px] font-bold px-2 py-0.5 rounded-full border border-emerald-500/30">COM DESCONTO</span>
-                        </div>
-                        <div class="text-3xl font-black text-emerald-400" id="resNovoCustoTotal">R$ 0,00</div>
-                        <div class="text-xs text-emerald-300/80 mt-1 pb-4 border-b border-slate-800/80 flex items-center gap-1">
-                            <i class="fa-solid fa-arrow-down-long"></i> Redução real na despesa mensal
-                        </div>
-
-                        <div class="mt-4 space-y-2.5 text-xs">
-                            <div class="flex justify-between items-center p-2 rounded-lg bg-slate-950/50 border border-slate-800">
-                                <div>
-                                    <span class="block font-medium text-slate-300">1. Fatura Concessionária</span>
-                                    <span class="text-[10px] text-slate-400" id="resMinimoLabel">(30 kWh retidos + Cip-Ilum Pub + Taxas)</span>
-                                </div>
-                                <span class="font-bold text-slate-200" id="resFaturaConcessionaria">R$ 0,00</span>
-                            </div>
-
-                            <div class="flex justify-between items-center p-2 rounded-lg bg-emerald-950/40 border border-emerald-500/30">
-                                <div>
-                                    <span class="block font-semibold text-emerald-300">2. Boleto Cooperativa</span>
-                                    <span class="text-[10px] text-emerald-400/80" id="resCompensadoLabel">(558 kWh com 20% OFF)</span>
-                                </div>
-                                <span class="font-bold text-emerald-300" id="resBoletoCooperativa">R$ 0,00</span>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="glass-panel neon-card rounded-2xl p-6 border border-yellow-500/50 bg-gradient-to-r from-yellow-950/20 via-slate-900 to-emerald-950/20 relative">
-                    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-                        <div>
-                            <span class="text-xs font-bold uppercase tracking-wider text-yellow-400 flex items-center justify-center sm:justify-start gap-1.5">
-                                <i class="fa-solid fa-piggy-bank"></i> Economia Líquida Mensal
-                            </span>
-                            <div class="text-3xl sm:text-4xl font-black text-white mt-1" id="resEconomiaMensal">R$ 0,00</div>
-                            <p class="text-xs text-slate-400 mt-1">
-                                Representa um desconto real global de <strong class="text-yellow-300 font-bold" id="resPctRealGlobal">0%</strong> na sua fatura.
-                            </p>
-                        </div>
-                        <div class="bg-yellow-500/10 border border-yellow-500/30 px-5 py-3 rounded-xl text-center sm:text-right min-w-[160px]">
-                            <span class="text-[10px] font-semibold text-yellow-300 uppercase block">Economia em 1 Ano</span>
-                            <span class="text-xl font-extrabold text-yellow-400" id="resEconomiaAnual">R$ 0,00</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="glass-panel neon-card rounded-2xl p-6 border border-slate-800">
-                    <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
-                        <i class="fa-solid fa-chart-line text-emerald-400"></i> Projeção de Acúmulo de Economia ao Longo do Tempo
-                    </h3>
-
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
-                        <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-yellow-400/50 transition">
-                            <span class="text-[11px] text-slate-400 font-medium block">1 Ano</span>
-                            <span class="text-base font-extrabold text-emerald-400 mt-1 block" id="proj1Ano">R$ 0,00</span>
-                        </div>
-                        <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-yellow-400/50 transition">
-                            <span class="text-[11px] text-slate-400 font-medium block">3 Anos</span>
-                            <span class="text-base font-extrabold text-emerald-400 mt-1 block" id="proj3Anos">R$ 0,00</span>
-                        </div>
-                        <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-yellow-400/50 transition">
-                            <span class="text-[11px] text-slate-400 font-medium block">5 Anos</span>
-                            <span class="text-base font-extrabold text-yellow-400 mt-1 block" id="proj5Anos">R$ 0,00</span>
-                        </div>
-                        <div class="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 hover:border-yellow-400/50 transition">
-                            <span class="text-[11px] text-slate-400 font-medium block">10 Anos</span>
-                            <span class="text-base font-extrabold text-yellow-300 mt-1 block" id="proj10Anos">R$ 0,00</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="glass-panel rounded-2xl p-5 border border-slate-800 bg-slate-950/40">
-                    <h4 class="text-xs font-bold text-slate-200 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                        <i class="fa-solid fa-circle-info text-yellow-400"></i> Entenda a Regra Técnica do Desconto (ANEEL RN 1.000)
-                    </h4>
-                    <p class="text-xs text-slate-400 leading-relaxed" id="explicacaoTecnica">
-                        Carregando informações técnicas do cálculo...
-                    </p>
-                </div>
-
-            </div>
-
-        </div>
-
-    </main>
-
-    <!-- Template Oculto para Proposta Formal em PDF (Uma única página limpa) -->
-    <div id="pdfPropostaTemplate" style="display: none; width: 190mm; background: #ffffff; color: #1e293b; padding: 15mm; font-family: 'Inter', sans-serif; box-sizing: border-box;">
-        
-        <!-- Cabeçalho Proposta -->
-        <div style="border-bottom: 2px solid #10b981; padding-bottom: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h1 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0; text-transform: uppercase;">Proposta Comercial</h1>
-                <p style="font-size: 11px; color: #64748b; margin: 2px 0 0 0;">Energia Solar por Assinatura - Simulação Oficial</p>
-            </div>
-            <div style="text-align: right;">
-                <span style="font-size: 11px; font-weight: 700; color: #047857; background: #ecfdf5; padding: 4px 10px; border-radius: 4px; border: 1px solid #a7f3d0;">Plano PRO</span>
-                <p id="pdfDataEmissao" style="font-size: 10px; color: #64748b; margin: 4px 0 0 0;"></p>
-            </div>
-        </div>
-
-        <!-- Bloco 1: Dados do Cliente / Fatura Atual -->
-        <div style="margin-bottom: 15px;">
-            <h3 style="font-size: 12px; font-weight: 700; color: #334155; text-transform: uppercase; margin-bottom: 6px; border-left: 3px solid #f59e0b; padding-left: 6px;">1. Parâmetros da Fatura Atual</h3>
-            <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
-                <tr>
-                    <td style="padding: 6px; background: #f8fafc; border: 1px solid #e2e8f0; width: 25%;"><b>Tipo de Padrão:</b> <span id="pdfTipoLigacao">-</span></td>
-                    <td style="padding: 6px; background: #f8fafc; border: 1px solid #e2e8f0; width: 25%;"><b>Consumo Mensal:</b> <span id="pdfConsumoTotal">-</span></td>
-                    <td style="padding: 6px; background: #f8fafc; border: 1px solid #e2e8f0; width: 25%;"><b>Tarifa Consumo:</b> <span id="pdfTarifaKwh">-</span></td>
-                    <td style="padding: 6px; background: #f8fafc; border: 1px solid #e2e8f0; width: 25%;"><b>Cip-Ilum Pub + Taxas:</b> <span id="pdfCip">-</span></td>
-                </tr>
-            </table>
-        </div>
-
-        <!-- Bloco 2: Comparativo de Custos -->
-        <div style="margin-bottom: 15px;">
-            <h3 style="font-size: 12px; font-weight: 700; color: #334155; text-transform: uppercase; margin-bottom: 6px; border-left: 3px solid #10b981; padding-left: 6px;">2. Comparativo de Custo Mensal</h3>
-            <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
-                <thead>
-                    <tr style="background: #f1f5f9; color: #334155; text-align: left;">
-                        <th style="padding: 8px; border: 1px solid #cbd5e1;">Cenário</th>
-                        <th style="padding: 8px; border: 1px solid #cbd5e1;">Detalhamento / Composição</th>
-                        <th style="padding: 8px; border: 1px solid #cbd5e1; text-align: right;">Custo Total Mensal</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td style="padding: 8px; border: 1px solid #e2e8f0; font-weight: 600; color: #64748b;">Cenário Atual (Sem Solar)</td>
-                        <td style="padding: 8px; border: 1px solid #e2e8f0; color: #475569;">100% Pago à Concessionária local</td>
-                        <td id="pdfValorAntigo" style="padding: 8px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #475569;">R$ 0,00</td>
-                    </tr>
-                    <tr style="background: #ecfdf5;">
-                        <td style="padding: 8px; border: 1px solid #a7f3d0; font-weight: 600; color: #047857;">Novo Custo Combinado</td>
-                        <td style="padding: 8px; border: 1px solid #a7f3d0; color: #065f46;">
-                            1. Concessionária: <span id="pdfDetFaturaConcessionaria">R$ 0,00</span><br>
-                            2. Cooperativa Solar (<span id="pdfDescontoPct">20%</span> OFF): <span id="pdfDetBoletoCooperativa">R$ 0,00</span>
-                        </td>
-                        <td id="pdfValorNovo" style="padding: 8px; border: 1px solid #a7f3d0; text-align: right; font-weight: 800; color: #047857; font-size: 13px;">R$ 0,00</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Bloco 3: Destaque da Economia -->
-        <div style="background: #fefce8; border: 1px solid #fde047; border-radius: 6px; padding: 12px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <span style="font-size: 10px; font-weight: 700; color: #854d0e; text-transform: uppercase; display: block;">Economia Líquida Mensal</span>
-                <span id="pdfEconomiaMensal" style="font-size: 18px; font-weight: 800; color: #713f12;">R$ 0,00</span>
-                <span style="font-size: 10px; color: #854d0e; display: block; margin-top: 2px;">Redução real de <b id="pdfPctGlobal">0%</b> na fatura de energia.</span>
-            </div>
-            <div style="text-align: right; background: #ffffff; padding: 8px 12px; border-radius: 4px; border: 1px solid #fef08a;">
-                <span style="font-size: 9px; font-weight: 700; color: #854d0e; text-transform: uppercase; display: block;">Economia Acumulada em 1 Ano</span>
-                <span id="pdfEconomiaAnual" style="font-size: 14px; font-weight: 800; color: #ca8a04;">R$ 0,00</span>
-            </div>
-        </div>
-
-        <!-- Bloco 4: Projeção de Longo Prazo -->
-        <div style="margin-bottom: 15px;">
-            <h3 style="font-size: 12px; font-weight: 700; color: #334155; text-transform: uppercase; margin-bottom: 6px; border-left: 3px solid #3b82f6; padding-left: 6px;">3. Projeção de Economia Acumulada</h3>
-            <table style="width: 100%; border-collapse: collapse; font-size: 11px; text-align: center;">
-                <thead>
-                    <tr style="background: #f1f5f9; color: #334155;">
-                        <th style="padding: 6px; border: 1px solid #cbd5e1;">1 Ano</th>
-                        <th style="padding: 6px; border: 1px solid #cbd5e1;">3 Anos</th>
-                        <th style="padding: 6px; border: 1px solid #cbd5e1;">5 Anos</th>
-                        <th style="padding: 6px; border: 1px solid #cbd5e1;">10 Anos</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td id="pdfProj1" style="padding: 6px; border: 1px solid #e2e8f0; font-weight: 700; color: #047857;">R$ 0,00</td>
-                        <td id="pdfProj3" style="padding: 6px; border: 1px solid #e2e8f0; font-weight: 700; color: #047857;">R$ 0,00</td>
-                        <td id="pdfProj5" style="padding: 6px; border: 1px solid #e2e8f0; font-weight: 700; color: #2563eb;">R$ 0,00</td>
-                        <td id="pdfProj10" style="padding: 6px; border: 1px solid #e2e8f0; font-weight: 700; color: #ca8a04;">R$ 0,00</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Rodapé / Termos -->
-        <div style="border-top: 1px solid #e2e8f0; padding-top: 10px; font-size: 9px; color: #64748b; text-align: center; line-height: 1.3;">
-            <p><b>Condições:</b> Adesão sem investimento em obras, sem fidelidade abusiva e sem taxas de manutenção. Sujeito à disponibilidade de saldo na cooperativa solar.</p>
-            <p style="margin-top: 3px;">Gerado por <b>CALC. ENERGIA SOLAR POR ASSINATURA (Pro)</b></p>
-        </div>
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-4 py-6 w-full flex-grow">
+    
+    <div class="text-center mb-8">
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-100 mb-2">
+        Calcule sua <span class="text-emerald-400">Economia Real</span> na Fatura
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto">
+        Transparência total: veja exatamente o valor abatido do seu consumo e o saldo final combinando a concessionária e a cooperativa.
+      </p>
     </div>
 
-    <!-- JavaScript Logic -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed: ', err));
-            });
-        }
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- CARD 1: DADOS DA FATURA ATUAL (Esquerda) -->
+      <div class="lg:col-span-5 bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+        <div>
+          <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-800">
+            <h3 class="font-bold text-slate-200 text-sm flex items-center gap-2">
+              <i data-lucide="sliders" class="w-4 h-4 text-cyan-400"></i>
+              Dados da Fatura Atual
+            </h3>
+            <span class="text-[10px] text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 font-medium">Etapa 1 de 2</span>
+          </div>
 
-        // Preset 1: Exemplo Monofásico (30 kWh min)
-        function presetExemploNeudson() {
-            document.getElementById('tipoFornecimento').value = "mono";
-            document.getElementById('tarifaKwhInput').value = "1.22989";
-            document.getElementById('tarifaMinimaInput').value = "0.94633";
-            document.getElementById('consumoKwh').value = "588";
-            document.getElementById('taxaCip').value = "38.61";
-            document.getElementById('pctDesconto').value = "20";
+          <!-- Tipo de Ligação -->
+          <div class="mb-4">
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">TIPO DE LIGAÇÃO (CUSTO DE DISPONIBILIDADE)</label>
+            <div class="grid grid-cols-2 gap-3">
+              <button id="btn-mono" onclick="setPadrao('monofasico')" class="p-3 text-left rounded-xl border border-slate-800 bg-slate-950/50 hover:bg-slate-800/50 transition">
+                <div class="flex items-center gap-2 text-xs font-bold text-slate-300 mb-1">
+                  <i data-lucide="home" class="w-3.5 h-3.5 text-cyan-400"></i> Monofásico
+                </div>
+                <div class="text-[10px] text-slate-500">Retém 30 kWh min</div>
+              </button>
+              <button id="btn-tri" onclick="setPadrao('trifasico')" class="p-3 text-left rounded-xl border border-cyan-500/50 bg-slate-950/50 neon-border-active transition">
+                <div class="flex items-center gap-2 text-xs font-bold text-slate-200 mb-1">
+                  <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i> Trifásico
+                </div>
+                <div class="text-[10px] text-slate-400">Retém 100 kWh min</div>
+              </button>
+            </div>
+          </div>
 
-            document.getElementById('btnMono').className = "p-2.5 rounded-xl border border-emerald-500/40 bg-emerald-500/10 text-emerald-300 hover:bg-emerald-500/20 transition text-left";
-            document.getElementById('btnTri').className = "p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 text-slate-300 hover:border-yellow-400/50 hover:text-yellow-300 transition text-left";
+          <!-- Inputs -->
+          <div class="space-y-3">
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-300 font-medium">CONSUMO MENSAL (kWh)</span>
+                <span class="text-slate-500 text-[10px]">Medido na fatura</span>
+              </div>
+              <input type="number" id="input-kwh" oninput="calculate()" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-lg px-3 py-2 text-sm text-slate-100 font-semibold focus:outline-none transition">
+            </div>
 
-            atualizarDescontoLabel();
-            calcularSimulacao();
-        }
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-300 font-medium">TARIFA DO kWh CONSUMO (R$)</span>
+                <span class="text-slate-500 text-[10px]">Tarifa Cheia com Impostos</span>
+              </div>
+              <input type="number" step="0.00001" id="input-tarifa-consumo" oninput="calculate()" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-lg px-3 py-2 text-sm text-slate-100 font-semibold focus:outline-none transition">
+            </div>
 
-        // Preset 2: Exemplo Trifásico (100 kWh min - Base Brasil Verde)
-        function presetExemploAntonio() {
-            document.getElementById('tipoFornecimento').value = "tri";
-            document.getElementById('tarifaKwhInput').value = "1.22989";
-            document.getElementById('tarifaMinimaInput').value = "1.16020";
-            document.getElementById('consumoKwh').value = "2817";
-            document.getElementById('taxaCip').value = "405.42"; 
-            document.getElementById('pctDesconto').value = "20";
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-300 font-medium">TARIFA DA TAXA MÍNIMA (R$/kWh)</span>
+                <span class="text-slate-500 text-[10px]">Disponibilidade</span>
+              </div>
+              <input type="number" step="0.00001" id="input-tarifa-minima" oninput="calculate()" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-lg px-3 py-2 text-sm text-slate-100 font-semibold focus:outline-none transition">
+            </div>
 
-            document.getElementById('btnTri').className = "p-2.5 rounded-xl border border-yellow-400/50 bg-yellow-500/10 text-yellow-300 hover:bg-yellow-500/20 transition text-left";
-            document.getElementById('btnMono').className = "p-2.5 rounded-xl border border-slate-800 bg-slate-950/60 text-slate-300 hover:border-emerald-500/50 hover:text-emerald-300 transition text-left";
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-300 font-medium">CIP - ILUM PUB (R$)</span>
+                <span class="text-slate-500 text-[10px]">Não compensável</span>
+              </div>
+              <input type="number" step="0.01" id="input-cip" oninput="calculate()" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-lg px-3 py-2 text-sm text-slate-100 font-semibold focus:outline-none transition">
+            </div>
 
-            atualizarDescontoLabel();
-            calcularSimulacao();
-        }
+            <div>
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-300 font-medium">OUTROS ENCARGOS / BANDEIRAS / MULTAS / TAXAS (R$)</span>
+                <span class="text-emerald-400 text-[10px]">Ajustes Reais</span>
+              </div>
+              <input type="number" step="0.01" id="input-outros" oninput="calculate()" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-lg px-3 py-2 text-sm text-slate-100 font-semibold focus:outline-none transition">
+            </div>
 
-        function atualizarDescontoLabel() {
-            const val = document.getElementById('pctDesconto').value;
-            document.getElementById('pctDescontoVal').innerText = val + '%';
-        }
+            <!-- Slider Desconto -->
+            <div class="pt-2">
+              <div class="flex justify-between text-xs mb-1">
+                <span class="text-slate-300 font-medium">DESCONTO DA COOPERATIVA NO CONSUMO (%)</span>
+                <span id="label-desconto" class="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">20%</span>
+              </div>
+              <input type="range" id="input-desconto" min="5" max="30" value="20" oninput="calculate()" class="w-full accent-cyan-400 bg-slate-950 rounded-lg cursor-pointer">
+            </div>
+          </div>
+        </div>
 
-        function calcularSimulacao() {
-            const tarifaKwh = parseFloat(document.getElementById('tarifaKwhInput').value) || 0;
-            const tarifaMinima = parseFloat(document.getElementById('tarifaMinimaInput').value) || 0;
-            const consumoKwh = parseFloat(document.getElementById('consumoKwh').value) || 0;
-            const taxaCip = parseFloat(document.getElementById('taxaCip').value) || 0;
-            const pctDesconto = parseFloat(document.getElementById('pctDesconto').value) || 20;
+        <div class="mt-4 pt-3 border-t border-slate-800/80 flex justify-between items-center text-[11px] text-slate-500">
+          <span class="flex items-center gap-1"><i data-lucide="shield-check" class="w-3.5 h-3.5 text-emerald-400"></i> Regulamentado ANEEL</span>
+          <span>Atualizado em Tempo Real</span>
+        </div>
+      </div>
 
-            const tipoFornecimento = document.getElementById('tipoFornecimento').value;
-            let kwhMinimo = 30;
-            let nomeTipo = "Monofásico";
+      <!-- PAINEL DIREITO: RESULTADOS DA AUDITORIA E PROJEÇÃO -->
+      <div class="lg:col-span-7 space-y-6 flex flex-col justify-between">
+        
+        <!-- CARDS DE CENÁRIOS COMPARATIVOS -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          
+          <!-- CARD CENÁRIO ATUAL -->
+          <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl relative overflow-hidden">
+            <div class="flex justify-between items-start mb-3">
+              <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">CENÁRIO ATUAL</span>
+              <i data-lucide="receipt" class="w-4 h-4 text-slate-500"></i>
+            </div>
+            <div id="display-custo-atual" class="text-2xl font-extrabold text-slate-100 mb-1">R$ 0,00</div>
+            <div class="text-[11px] text-slate-400 mb-4">100% Pago à Concessionária</div>
 
-            if (tipoFornecimento === 'tri') {
-                kwhMinimo = 100;
-                nomeTipo = "Trifásico";
-            }
+            <div class="space-y-1.5 pt-3 border-t border-slate-800 text-xs">
+              <div class="flex justify-between text-slate-400">
+                <span>Consumo Total:</span>
+                <span id="txt-kwh-total" class="font-semibold text-slate-200">0 kWh</span>
+              </div>
+              <div class="flex justify-between text-slate-400">
+                <span>Tarifa do kWh:</span>
+                <span id="txt-tarifa" class="font-semibold text-slate-200">R$ 0,00</span>
+              </div>
+              <div class="flex justify-between text-slate-400">
+                <span>CIP - ILUM PUB (R$):</span>
+                <span id="txt-cip" class="font-semibold text-slate-200">R$ 0,00</span>
+              </div>
+              <div class="flex justify-between text-slate-400">
+                <span>OUTROS ENCARGOS / BANDEIRAS / MULTAS / TAXAS (R$):</span>
+                <span id="txt-outros" class="font-semibold text-slate-200">R$ 0,00</span>
+              </div>
+            </div>
+          </div>
 
-            if (consumoKwh <= 0 || tarifaKwh <= 0) return;
+          <!-- CARD NOVO CUSTO COMBINADO -->
+          <div class="bg-slate-900/80 border border-cyan-500/30 rounded-2xl p-5 shadow-xl relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900 to-cyan-950/20">
+            <div class="flex justify-between items-start mb-3">
+              <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">NOVO CUSTO COMBINADO</span>
+              <span class="text-[10px] font-bold bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20">COM DESCONTO</span>
+            </div>
+            <div id="display-novo-custo" class="text-2xl font-extrabold text-cyan-400 mb-1">R$ 0,00</div>
+            <div class="text-[11px] text-emerald-400 font-medium mb-4 flex items-center gap-1">
+              <i data-lucide="arrow-down-right" class="w-3.5 h-3.5"></i> Redução real na despesa mensal
+            </div>
 
-            const kwhRetidoConcessionaria = Math.min(consumoKwh, kwhMinimo);
-            const kwhCompensavel = Math.max(0, consumoKwh - kwhRetidoConcessionaria);
+            <div class="space-y-2 pt-3 border-t border-slate-800 text-xs">
+              <div class="p-2 bg-slate-950/60 rounded-lg border border-slate-800/80">
+                <div class="flex justify-between text-slate-300 font-semibold mb-0.5">
+                  <span>1. Fatura Concessionária</span>
+                  <span id="val-concessionaria" class="text-slate-100">R$ 0,00</span>
+                </div>
+                <div id="desc-concessionaria" class="text-[10px] text-slate-500">Taxas obrigatórias de iluminação e retenção</div>
+              </div>
 
-            // Custo da fatura antiga de referência
-            const valorConsumoBruto = (kwhCompensavel * tarifaKwh) + (kwhRetidoConcessionaria * tarifaMinima);
-            const valorContaSemDesconto = valorConsumoBruto + taxaCip;
+              <div class="p-2 bg-slate-950/60 rounded-lg border border-slate-800/80">
+                <div class="flex justify-between text-emerald-400 font-semibold mb-0.5">
+                  <span>2. Boleto Cooperativa</span>
+                  <span id="val-cooperativa">R$ 0,00</span>
+                </div>
+                <div id="desc-cooperativa" class="text-[10px] text-slate-500">Créditos de energia injetada</div>
+              </div>
+            </div>
+          </div>
 
-            // Alinhamento exato com a Fatura da Cooperativa Brasil Verde (onde 2.717 kWh resultam em R$ 2.521,81 com 20% OFF)
-            const baseBrutaCooperativa = (tipoFornecimento === 'tri' && consumoKwh === 2817) ? (2521.81 / 0.8) : (kwhCompensavel * tarifaKwh);
-            const novoBoletoCooperativa = baseBrutaCooperativa * (1 - (pctDesconto / 100));
-            const valorEconomiaMensal = baseBrutaCooperativa * (pctDesconto / 100);
-            
-            const custoMinimoRetido = kwhRetidoConcessionaria * tarifaMinima;
-            const novaFaturaConcessionaria = custoMinimoRetido + taxaCip;
-            const novoCustoTotalCombinado = novaFaturaConcessionaria + novoBoletoCooperativa;
+        </div>
 
-            const pctRealGlobal = (valorContaSemDesconto > 0) ? ((valorContaSemDesconto - novoCustoTotalCombinado) / valorContaSemDesconto) * 100 : 0;
+        <!-- CARD ECONOMIA LÍQUIDA HIGHLIGHT -->
+        <div class="bg-gradient-to-r from-emerald-950/40 via-slate-900 to-emerald-950/20 border border-emerald-500/30 rounded-2xl p-5 shadow-xl flex flex-col sm:flex-row justify-between items-center gap-4">
+          <div>
+            <div class="flex items-center gap-2 text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">
+              <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i> ECONOMIA LÍQUIDA MENSAL
+            </div>
+            <div id="display-economia-mensal" class="text-3xl font-black text-slate-100">R$ 0,00</div>
+            <div id="display-percentual-real" class="text-xs text-slate-400 mt-1">
+              Representa um desconto real global de <span class="font-bold text-emerald-400">0%</span> na sua fatura.
+            </div>
+          </div>
+          <div class="bg-amber-500/10 border border-amber-500/20 rounded-xl p-3 text-center sm:text-right w-full sm:w-auto">
+            <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wider block mb-0.5">ECONOMIA EM 1 ANO</span>
+            <span id="display-economia-1ano" class="text-xl font-bold text-amber-400">R$ 0,00</span>
+          </div>
+        </div>
 
-            const economiaAnual = valorEconomiaMensal * 12;
-            const economia3Anos = economiaAnual * 3;
-            const economia5Anos = economiaAnual * 5;
-            const economia10Anos = economiaAnual * 10;
+        <!-- CARD PROJEÇÃO DE ACÚMULO DE ECONOMIA -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
+          <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <i data-lucide="trending-up" class="w-4 h-4 text-cyan-400"></i> Projeção de Acúmulo de Economia ao Longo do Tempo
+          </h4>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="p-3 bg-slate-950/50 rounded-xl border border-slate-800 text-center">
+              <span class="text-[10px] text-slate-500 block mb-1">1 Ano</span>
+              <span id="proj-1ano" class="text-sm font-bold text-emerald-400">R$ 0,00</span>
+            </div>
+            <div class="p-3 bg-slate-950/50 rounded-xl border border-slate-800 text-center">
+              <span class="text-[10px] text-slate-500 block mb-1">3 Anos</span>
+              <span id="proj-3anos" class="text-sm font-bold text-emerald-400">R$ 0,00</span>
+            </div>
+            <div class="p-3 bg-slate-950/50 rounded-xl border border-slate-800 text-center">
+              <span class="text-[10px] text-slate-500 block mb-1">5 Anos</span>
+              <span id="proj-5anos" class="text-sm font-bold text-amber-400">R$ 0,00</span>
+            </div>
+            <div class="p-3 bg-slate-950/50 rounded-xl border border-slate-800 text-center">
+              <span class="text-[10px] text-slate-500 block mb-1">10 Anos</span>
+              <span id="proj-10anos" class="text-sm font-bold text-amber-400">R$ 0,00</span>
+            </div>
+          </div>
+        </div>
 
-            const fmtR = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            const fmtDec5 = (v) => v.toLocaleString('pt-BR', { minimumFractionDigits: 5, maximumFractionDigits: 5 });
+        <!-- EXPLICAÇÃO TÉCNICA REGRAS ANEEL -->
+        <div class="p-4 bg-slate-900/40 border border-slate-800/80 rounded-xl text-xs text-slate-400 space-y-1">
+          <div class="font-bold text-slate-300 flex items-center gap-1.5 mb-1">
+            <i data-lucide="info" class="w-4 h-4 text-amber-400"></i> ENTENDA A REGRA TÉCNICA DO DESCONTO (ANEEL RN 1.000)
+          </div>
+          <p id="txt-explicacao-tecnica">
+            Sua ligação possui retenção mínima obrigatória. A distribuidora de energia retém a taxa de disponibilidade mais a Iluminação Pública. O desconto incide sobre o consumo compensado injetado.
+          </p>
+        </div>
 
-            // Atualização no DOM da Tela Principal
-            document.getElementById('resContaAntiga').innerText = fmtR(valorContaSemDesconto);
-            document.getElementById('resConsumoTotal').innerText = consumoKwh + ' kWh';
-            document.getElementById('resTarifaKwh').innerText = 'R$ ' + fmtDec5(tarifaKwh) + ' / kWh';
-            document.getElementById('resTaxaAntiga').innerText = fmtR(taxaCip);
+      </div>
 
-            document.getElementById('resNovoCustoTotal').innerText = fmtR(novoCustoTotalCombinado);
-            document.getElementById('resFaturaConcessionaria').innerText = fmtR(novaFaturaConcessionaria);
-            document.getElementById('resBoletoCooperativa').innerText = fmtR(novoBoletoCooperativa);
+    </div>
+  </main>
 
-            document.getElementById('resMinimoLabel').innerText = `(${kwhRetidoConcessionaria} kWh a R$ ${fmtDec5(tarifaMinima)} + Cip-Ilum Pub + Taxas = ${fmtR(novaFaturaConcessionaria)})`;
-            document.getElementById('resCompensadoLabel').innerText = `(${kwhCompensavel} kWh com ${pctDesconto}% OFF)`;
+  <!-- Footer -->
+  <footer class="border-t border-slate-800/80 py-4 px-4 text-center text-xs text-slate-500 mt-8">
+    <p>CALC. ENERGIA SOLAR POR ASSINATURA (Pro) • Sistema de Gestão Financeira Auditável</p>
+  </footer>
 
-            document.getElementById('resEconomiaMensal').innerText = fmtR(valorEconomiaMensal);
-            document.getElementById('resPctRealGlobal').innerText = pctRealGlobal.toFixed(1) + '%';
-            document.getElementById('resEconomiaAnual').innerText = fmtR(economiaAnual);
+  <!-- TEMPLATE OCULTO PARA IMPRESSÃO EM PDF EXECUTIVO (FORMATO OFICIAL PRINT 2) -->
+  <div id="pdf-template">
+    <div class="pdf-page" id="pdf-content">
+      <!-- Header do PDF -->
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 3px solid #10b981; padding-bottom: 12px; margin-bottom: 20px;">
+        <div>
+          <h1 style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 0; tracking-tight;">PROPOSTA COMERCIAL</h1>
+          <p style="font-size: 12px; color: #64748b; margin: 4px 0 0 0;">Energia Solar por Assinatura - Simulação Oficial</p>
+        </div>
+        <div style="text-align: right;">
+          <span style="background: #d1fae5; color: #047857; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px;">Plano PRO</span>
+          <p id="pdf-date" style="font-size: 10px; color: #94a3b8; margin: 6px 0 0 0;">Data: 30/10/2026</p>
+        </div>
+      </div>
 
-            document.getElementById('proj1Ano').innerText = fmtR(economiaAnual);
-            document.getElementById('proj3Anos').innerText = fmtR(economia3Anos);
-            document.getElementById('proj5Anos').innerText = fmtR(economia5Anos);
-            document.getElementById('proj10Anos').innerText = fmtR(economia10Anos);
+      <!-- Seção 1: Parâmetros Fatura Atual -->
+      <div style="margin-bottom: 20px;">
+        <h2 style="font-size: 12px; font-weight: 700; color: #0f172a; text-transform: uppercase; margin-bottom: 8px; border-left: 3px solid #f59e0b; padding-left: 8px;">
+          1. PARÂMETROS DA FATURA ATUAL
+        </h2>
+        <table style="width: 100%; border-collapse: collapse; background: #f8fafc; border: 1px solid #e2e8f0; font-size: 11px; border-radius: 6px;">
+          <tr>
+            <td style="padding: 10px; border-right: 1px solid #e2e8f0;">
+              <span style="color: #64748b; display: block; font-size: 10px;">Tipo de Padrão:</span>
+              <strong id="pdf-padrao-txt" style="color: #0f172a;">Trifásico (100 kWh min)</strong>
+            </td>
+            <td style="padding: 10px; border-right: 1px solid #e2e8f0;">
+              <span style="color: #64748b; display: block; font-size: 10px;">Consumo Mensal:</span>
+              <strong id="pdf-kwh-txt" style="color: #0f172a;">2817 kWh</strong>
+            </td>
+            <td style="padding: 10px; border-right: 1px solid #e2e8f0;">
+              <span style="color: #64748b; display: block; font-size: 10px;">Tarifa Consumo:</span>
+              <strong id="pdf-tarifa-txt" style="color: #0f172a;">R$ 1,16020</strong>
+            </td>
+            <td style="padding: 10px;">
+              <span style="color: #64748b; display: block; font-size: 10px;">Cip-Ilum Pub + Taxas:</span>
+              <strong id="pdf-cip-txt" style="color: #0f172a;">R$ 405,42</strong>
+            </td>
+          </tr>
+        </table>
+      </div>
 
-            document.getElementById('explicacaoTecnica').innerHTML = `
-                Sua ligação é <strong>${nomeTipo}</strong>. A distribuidora de energia retém obrigatoriamente a taxa de disponibilidade de <strong>${kwhMinimo} kWh</strong> na tarifa específica de R$ ${fmtDec5(tarifaMinima)} (${fmtR(custoMinimoRetido)}) mais Cip-Ilum Pub + Taxas (${fmtR(taxaCip)}), totalizando <strong>${fmtR(novaFaturaConcessionaria)}</strong> na fatura da distribuidora. 
-                O desconto de <strong>${pctDesconto}%</strong> é aplicado sobre o consumo injetado pela cooperativa (<strong>${kwhCompensavel} kWh</strong>), gerando uma economia mensal líquida de <strong>${fmtR(valorEconomiaMensal)}</strong>.
-            `;
+      <!-- Seção 2: Comparativo de Custo Mensal -->
+      <div style="margin-bottom: 20px;">
+        <h2 style="font-size: 12px; font-weight: 700; color: #0f172a; text-transform: uppercase; margin-bottom: 8px; border-left: 3px solid #10b981; padding-left: 8px;">
+          2. COMPARATIVO DE CUSTO MENSAL
+        </h2>
+        <table style="width: 100%; border-collapse: collapse; border: 1px solid #e2e8f0; font-size: 11px;">
+          <thead>
+            <tr style="background: #f1f5f9; color: #334155; text-align: left;">
+              <th style="padding: 10px; border: 1px solid #cbd5e1; width: 30%;">Cenário</th>
+              <th style="padding: 10px; border: 1px solid #cbd5e1; width: 45%;">Detalhamento / Composição</th>
+              <th style="padding: 10px; border: 1px solid #cbd5e1; width: 25%; text-align: right;">Custo Total Mensal</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 600; color: #475569;">Cenário Atual (Sem Solar)</td>
+              <td style="padding: 10px; border: 1px solid #e2e8f0; color: #64748b;">100% Pago à Concessionária local</td>
+              <td id="pdf-custo-atual-val" style="padding: 10px; border: 1px solid #e2e8f0; text-align: right; font-weight: 700; color: #0f172a;">R$ 3.863,05</td>
+            </tr>
+            <tr style="background: #ecfdf5;">
+              <td style="padding: 10px; border: 1px solid #a7f3d0; font-weight: 700; color: #047857;">Novo Custo Combinado</td>
+              <td id="pdf-detalhamento-combinado" style="padding: 10px; border: 1px solid #a7f3d0; color: #065f46; font-size: 10.5px;">
+                1. Concessionária: R$ 521,44<br>
+                2. Cooperativa Solar (20% OFF): R$ 2.521,81
+              </td>
+              <td id="pdf-novo-custo-val" style="padding: 10px; border: 1px solid #a7f3d0; text-align: right; font-weight: 800; color: #047857; font-size: 13px;">R$ 3.043,25</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-            // Alimentar Template Oculto do PDF
-            document.getElementById('pdfDataEmissao').innerText = "Data: " + new Date().toLocaleDateString('pt-BR');
-            document.getElementById('pdfTipoLigacao').innerText = nomeTipo + ` (${kwhMinimo} kWh min)`;
-            document.getElementById('pdfConsumoTotal').innerText = consumoKwh + ' kWh';
-            document.getElementById('pdfTarifaKwh').innerText = 'R$ ' + fmtDec5(tarifaKwh);
-            document.getElementById('pdfCip').innerText = fmtR(taxaCip);
-            document.getElementById('pdfValorAntigo').innerText = fmtR(valorContaSemDesconto);
-            document.getElementById('pdfDetFaturaConcessionaria').innerText = fmtR(novaFaturaConcessionaria);
-            document.getElementById('pdfDetBoletoCooperativa').innerText = fmtR(novoBoletoCooperativa);
-            document.getElementById('pdfDescontoPct').innerText = pctDesconto + '%';
-            document.getElementById('pdfValorNovo').innerText = fmtR(novoCustoTotalCombinado);
-            document.getElementById('pdfEconomiaMensal').innerText = fmtR(valorEconomiaMensal);
-            document.getElementById('pdfPctGlobal').innerText = pctRealGlobal.toFixed(1) + '%';
-            document.getElementById('pdfEconomiaAnual').innerText = fmtR(economiaAnual);
-            document.getElementById('pdfProj1').innerText = fmtR(economiaAnual);
-            document.getElementById('pdfProj3').innerText = fmtR(economia3Anos);
-            document.getElementById('pdfProj5').innerText = fmtR(economia5Anos);
-            document.getElementById('pdfProj10').innerText = fmtR(economia10Anos);
-        }
+      <!-- Highlight Box Economia -->
+      <div style="background: #fffbeb; border: 2px solid #fde68a; border-radius: 8px; padding: 14px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <span style="font-size: 10px; font-weight: 700; color: #b45309; text-transform: uppercase;">ECONOMIA LÍQUIDA MENSAL</span>
+          <div id="pdf-economia-mensal-val" style="font-size: 26px; font-weight: 800; color: #78350f;">R$ 630,45</div>
+          <p id="pdf-percentual-txt" style="font-size: 10px; color: #b45309; margin: 2px 0 0 0;">
+            Redução real de <strong>17.16%</strong> na fatura de energia.
+          </p>
+        </div>
+        <div style="background: #ffffff; border: 1px solid #fcd34d; padding: 10px 16px; border-radius: 6px; text-align: right;">
+          <span style="font-size: 9px; font-weight: 700; color: #b45309; display: block;">ECONOMIA ACUMULADA EM 1 ANO</span>
+          <strong id="pdf-economia-1ano-val" style="font-size: 16px; color: #d97706;">R$ 7.565,43</strong>
+        </div>
+      </div>
 
-        // Função para exportação formal em uma única página PDF
-        function gerarPDFProposta() {
-            const element = document.getElementById('pdfPropostaTemplate');
-            element.style.display = 'block';
+      <!-- Seção 3: Projeção de Economia Acumulada -->
+      <div style="margin-bottom: 25px;">
+        <h2 style="font-size: 12px; font-weight: 700; color: #0f172a; text-transform: uppercase; margin-bottom: 8px; border-left: 3px solid #0284c7; padding-left: 8px;">
+          3. PROJEÇÃO DE ECONOMIA ACUMULADA
+        </h2>
+        <table style="width: 100%; border-collapse: collapse; border: 1px solid #e2e8f0; font-size: 11px; text-align: center;">
+          <thead>
+            <tr style="background: #f1f5f9; color: #334155;">
+              <th style="padding: 8px; border: 1px solid #cbd5e1; width: 25%;">1 Ano</th>
+              <th style="padding: 8px; border: 1px solid #cbd5e1; width: 25%;">3 Anos</th>
+              <th style="padding: 8px; border: 1px solid #cbd5e1; width: 25%;">5 Anos</th>
+              <th style="padding: 8px; border: 1px solid #cbd5e1; width: 25%;">10 Anos</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="pdf-p1" style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 700; color: #047857;">R$ 7.565,43</td>
+              <td id="pdf-p3" style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 700; color: #047857;">R$ 22.696,29</td>
+              <td id="pdf-p5" style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 700; color: #0284c7;">R$ 37.827,15</td>
+              <td id="pdf-p10" style="padding: 10px; border: 1px solid #e2e8f0; font-weight: 700; color: #d97706;">R$ 75.654,30</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
-            const opt = {
-                margin:       [10, 10, 10, 10],
-                filename:     'Proposta_Formal_Energia_Solar.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, backgroundColor: '#ffffff' },
-                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
+      <!-- Condições e Rodapé -->
+      <div style="border-top: 1px solid #e2e8f0; padding-top: 12px; text-align: center; font-size: 9px; color: #94a3b8; margin-top: 30px;">
+        <p style="margin: 0 0 4px 0;"><strong>Condições:</strong> Adesão sem investimento em obras, sem fidelidade abusiva e sem taxas de manutenção. Sujeito à disponibilidade de saldo na cooperativa solar.</p>
+        <p style="margin: 0;">Gerado por <strong>CALC. ENERGIA SOLAR POR ASSINATURA (Pro)</strong></p>
+      </div>
+    </div>
+  </div>
 
-            html2pdf().set(opt).from(element).save().then(() => {
-                element.style.display = 'none';
-            });
-        }
+  <!-- SCRIPT LÓGICO E INTERATIVO -->
+  <script>
+    // Presets oficiais exigidos
+    const PRESETS = {
+      trifasico: {
+        tipo: 'trifasico',
+        retencaoKwh: 100,
+        kwh: 2817,
+        tarifaConsumo: 1.16020,
+        tarifaMinima: 1.16020,
+        cip: 400.31,
+        outros: 5.11,
+        desconto: 20
+      },
+      monofasico: {
+        tipo: 'monofasico',
+        retencaoKwh: 30,
+        kwh: 588,
+        tarifaConsumo: 1.229898,
+        tarifaMinima: 0.946333,
+        cip: 31.46,
+        outros: 7.15,
+        desconto: 20
+      }
+    };
 
-        window.onload = function() {
-            presetExemploNeudson();
-        };
-    </script>
+    let currentPadrao = 'trifasico';
+
+    function initIcons() {
+      if (window.lucide) {
+        lucide.createIcons();
+      }
+    }
+
+    function setPadrao(padrao) {
+      currentPadrao = padrao;
+      const data = PRESETS[padrao];
+
+      document.getElementById('input-kwh').value = data.kwh;
+      document.getElementById('input-tarifa-consumo').value = data.tarifaConsumo;
+      document.getElementById('input-tarifa-minima').value = data.tarifaMinima;
+      document.getElementById('input-cip').value = data.cip;
+      document.getElementById('input-outros').value = data.outros;
+      document.getElementById('input-desconto').value = data.desconto;
+
+      // Update UI active buttons
+      const btnMono = document.getElementById('btn-mono');
+      const btnTri = document.getElementById('btn-tri');
+
+      if (padrao === 'monofasico') {
+        btnMono.className = "p-3 text-left rounded-xl border border-cyan-500/50 bg-slate-950/50 neon-border-active transition";
+        btnTri.className = "p-3 text-left rounded-xl border border-slate-800 bg-slate-950/50 hover:bg-slate-800/50 transition";
+      } else {
+        btnTri.className = "p-3 text-left rounded-xl border border-cyan-500/50 bg-slate-950/50 neon-border-active transition";
+        btnMono.className = "p-3 text-left rounded-xl border border-slate-800 bg-slate-950/50 hover:bg-slate-800/50 transition";
+      }
+
+      calculate();
+    }
+
+    function resetDefaults() {
+      setPadrao('trifasico');
+    }
+
+    function fmtR(val) {
+      return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function calculate() {
+      const kwh = parseFloat(document.getElementById('input-kwh').value) || 0;
+      const tarifaConsumo = parseFloat(document.getElementById('input-tarifa-consumo').value) || 0;
+      const tarifaMinima = parseFloat(document.getElementById('input-tarifa-minima').value) || 0;
+      const cip = parseFloat(document.getElementById('input-cip').value) || 0;
+      const outros = parseFloat(document.getElementById('input-outros').value) || 0;
+      const pctDesconto = parseFloat(document.getElementById('input-desconto').value) || 0;
+
+      const retencaoKwh = currentPadrao === 'trifasico' ? 100 : 30;
+
+      // 1. Cenário Atual
+      const custoConsumoPuro = kwh * tarifaConsumo;
+      const custoAtualTotal = custoConsumoPuro + cip + outros;
+
+      // 2. Com a Cooperativa (Novo Custo Combinado)
+      const kwhCompensavel = Math.max(0, kwh - retencaoKwh);
+      const valorRetencaoConcessionaria = retencaoKwh * tarifaMinima;
+      const valorFaturaConcessionaria = valorRetencaoConcessionaria + cip + outros;
+
+      const valorInjetadoSemDesconto = kwhCompensavel * tarifaConsumo;
+      const valorFaturaCooperativa = valorInjetadoSemDesconto * (1 - (pctDesconto / 100));
+
+      const novoCustoTotal = valorFaturaConcessionaria + valorFaturaCooperativa;
+
+      // 3. Economia
+      const economiaMensal = custoAtualTotal - novoCustoTotal;
+      const pctEconomiaReal = custoAtualTotal > 0 ? (economiaMensal / custoAtualTotal) * 100 : 0;
+
+      const economia1Ano = economiaMensal * 12;
+      const economia3Anos = economiaMensal * 36;
+      const economia5Anos = economiaMensal * 60;
+      const economia10Anos = economiaMensal * 120;
+
+      // Atualiza Tela
+      document.getElementById('label-desconto').innerText = `${pctDesconto}%`;
+      document.getElementById('display-custo-atual').innerText = fmtR(custoAtualTotal);
+      document.getElementById('txt-kwh-total').innerText = `${kwh} kWh`;
+      document.getElementById('txt-tarifa').innerText = `R$ ${tarifaConsumo.toFixed(5)}`;
+      document.getElementById('txt-cip').innerText = fmtR(cip);
+      document.getElementById('txt-outros').innerText = fmtR(outros);
+
+      document.getElementById('display-novo-custo').innerText = fmtR(novoCustoTotal);
+      document.getElementById('val-concessionaria').innerText = fmtR(valorFaturaConcessionaria);
+      document.getElementById('desc-concessionaria').innerText = `(${retencaoKwh} kWh a R$ ${tarifaMinima.toFixed(5)} + CIP + Taxas)`;
+      document.getElementById('val-cooperativa').innerText = fmtR(valorFaturaCooperativa);
+      document.getElementById('desc-cooperativa').innerText = `(${kwhCompensavel} kWh com ${pctDesconto}% OFF)`;
+
+      document.getElementById('display-economia-mensal').innerText = fmtR(economiaMensal);
+      document.getElementById('display-percentual-real').innerHTML = `Representa um desconto real global de <span class="font-bold text-emerald-400">${pctEconomiaReal.toFixed(2)}%</span> na sua fatura.`;
+      document.getElementById('display-economia-1ano').innerText = fmtR(economia1Ano);
+
+      document.getElementById('proj-1ano').innerText = fmtR(economia1Ano);
+      document.getElementById('proj-3anos').innerText = fmtR(economia3Anos);
+      document.getElementById('proj-5anos').innerText = fmtR(economia5Anos);
+      document.getElementById('proj-10anos').innerText = fmtR(economia10Anos);
+
+      document.getElementById('txt-explicacao-tecnica').innerText = 
+        `Sua ligação é ${currentPadrao === 'trifasico' ? 'Trifásica' : 'Monofásica'}. A distribuidora de energia retém obrigatoriamente a taxa de disponibilidade de ${retencaoKwh} kWh na tarifa de R$ ${tarifaMinima.toFixed(5)} (${fmtR(valorRetencaoConcessionaria)}), mais a CIP de ${fmtR(cip)} e encargos de ${fmtR(outros)}, totalizando ${fmtR(valorFaturaConcessionaria)} na fatura da distribuidora. O desconto de ${pctDesconto}% é aplicado sobre o consumo injetado pela cooperativa (${kwhCompensavel} kWh), gerando uma economia mensal líquida de ${fmtR(economiaMensal)}.`;
+
+      // Atualiza os dados do PDF
+      document.getElementById('pdf-padrao-txt').innerText = `${currentPadrao === 'trifasico' ? 'Trifásico (100 kWh min)' : 'Monofásico (30 kWh min)'}`;
+      document.getElementById('pdf-kwh-txt').innerText = `${kwh} kWh`;
+      document.getElementById('pdf-tarifa-txt').innerText = `R$ ${tarifaConsumo.toFixed(5)}`;
+      document.getElementById('pdf-cip-txt').innerText = fmtR(cip + outros);
+      document.getElementById('pdf-custo-atual-val').innerText = fmtR(custoAtualTotal);
+      document.getElementById('pdf-detalhamento-combinado').innerHTML = `1. Concessionária: ${fmtR(valorFaturaConcessionaria)}<br>2. Cooperativa Solar (${pctDesconto}% OFF): ${fmtR(valorFaturaCooperativa)}`;
+      document.getElementById('pdf-novo-custo-val').innerText = fmtR(novoCustoTotal);
+      document.getElementById('pdf-economia-mensal-val').innerText = fmtR(economiaMensal);
+      document.getElementById('pdf-percentual-txt').innerHTML = `Redução real de <strong>${pctEconomiaReal.toFixed(2)}%</strong> na fatura de energia.`;
+      document.getElementById('pdf-economia-1ano-val').innerText = fmtR(economia1Ano);
+
+      document.getElementById('pdf-p1').innerText = fmtR(economia1Ano);
+      document.getElementById('pdf-p3').innerText = fmtR(economia3Anos);
+      document.getElementById('pdf-p5').innerText = fmtR(economia5Anos);
+      document.getElementById('pdf-p10').innerText = fmtR(economia10Anos);
+    }
+
+    function generatePDF() {
+      const element = document.getElementById('pdf-content');
+      document.getElementById('pdf-template').style.display = 'block';
+
+      const opt = {
+        margin: 0,
+        filename: `Proposta_Comercial_Solar_${currentPadrao}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opt).from(element).save().then(() => {
+        document.getElementById('pdf-template').style.display = 'none';
+      });
+    }
+
+    window.onload = function() {
+      initIcons();
+      setPadrao('trifasico');
+    };
+  </script>
 </body>
 </html>
