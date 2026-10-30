@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calculadora de Economia - Energia Solar por Assinatura</title>
 
-    <!-- Ícone do Aplicativo / Favicon (Mude o href para a URL ou caminho da sua imagem .png / .ico / .svg) -->
+    <!-- PWA Manifest & Icons -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0B0F17">
     <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon.png">
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -53,7 +54,6 @@
             background-attachment: fixed;
         }
 
-        /* Glassmorphism Effect */
         .glass-panel {
             background: rgba(19, 27, 46, 0.7);
             backdrop-filter: blur(12px);
@@ -62,7 +62,6 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Neon Yellow Hover Effect */
         .neon-card {
             transition: all 0.3s ease;
         }
@@ -72,7 +71,6 @@
             transform: translateY(-2px);
         }
 
-        /* Custom Input Styles */
         .custom-input {
             background: rgba(11, 15, 23, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.12);
@@ -85,7 +83,6 @@
             outline: none;
         }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -134,7 +131,6 @@
     <!-- Main Container -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
 
-        <!-- Title Section -->
         <div class="text-center max-w-3xl mx-auto mb-10">
             <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
                 Calcule sua <span class="text-emerald-400 underline decoration-yellow-400/80 decoration-2 underline-offset-8">Economia Real</span> na Fatura
@@ -146,7 +142,7 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-            <!-- LEFT COLUMN: INPUT FORM (SIMULATOR) -->
+            <!-- LEFT COLUMN: INPUT FORM -->
             <div class="lg:col-span-5 space-y-6">
                 <div class="glass-panel neon-card rounded-2xl p-6 sm:p-7 border border-slate-800 relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-32 h-32 bg-yellow-500/5 rounded-full blur-2xl pointer-events-none"></div>
@@ -160,7 +156,6 @@
 
                     <form id="solarForm" onsubmit="return false;" class="mt-6 space-y-5">
                         
-                        <!-- 1. Tipo de Fornecimento -->
                         <div>
                             <label class="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
                                 Tipo de Padrão / Concessionária
@@ -190,7 +185,6 @@
                             </div>
                         </div>
 
-                        <!-- 2. Tarifa Unitária do kWh (R$) -->
                         <div>
                             <div class="flex justify-between items-center mb-1.5">
                                 <label for="tarifaKwhInput" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
@@ -205,7 +199,6 @@
                             </div>
                         </div>
 
-                        <!-- 3. Consumo Mensal (kWh) -->
                         <div>
                             <div class="flex justify-between items-center mb-1.5">
                                 <label for="consumoKwh" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
@@ -220,7 +213,6 @@
                             </div>
                         </div>
 
-                        <!-- 4. Taxas Fixas / CIP / Iluminação Pública -->
                         <div>
                             <div class="flex justify-between items-center mb-1.5">
                                 <label for="taxaCip" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
@@ -235,7 +227,6 @@
                             </div>
                         </div>
 
-                        <!-- 5. Desconto Garantido (%) -->
                         <div>
                             <div class="flex justify-between items-center mb-1.5">
                                 <label for="pctDesconto" class="text-xs font-semibold text-slate-300 uppercase tracking-wider">
@@ -252,7 +243,6 @@
                     </form>
                 </div>
 
-                <!-- Info Box de Apoio Comercial -->
                 <div class="glass-panel rounded-2xl p-5 border border-emerald-500/20 bg-emerald-950/10">
                     <div class="flex gap-3">
                         <div class="text-emerald-400 text-lg pt-0.5">
@@ -266,13 +256,11 @@
                 </div>
             </div>
 
-            <!-- RIGHT COLUMN: RESULTS & COMPARISON -->
+            <!-- RIGHT COLUMN: RESULTS -->
             <div class="lg:col-span-7 space-y-6">
 
-                <!-- MAIN COMPARISON CARDS (Side-by-side) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     
-                    <!-- Card Antes (Sem Cooperativa) -->
                     <div class="glass-panel neon-card rounded-2xl p-5 border border-slate-800 relative">
                         <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex items-center justify-between">
                             <span>Cenário Atual</span>
@@ -297,7 +285,6 @@
                         </div>
                     </div>
 
-                    <!-- Card Depois (Com Cooperativa Solar) -->
                     <div class="glass-panel neon-card rounded-2xl p-5 border border-emerald-500/40 bg-gradient-to-br from-slate-900/90 to-emerald-950/20 relative overflow-hidden">
                         <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-emerald-500/10 rounded-full blur-xl pointer-events-none"></div>
 
@@ -310,7 +297,6 @@
                             <i class="fa-solid fa-arrow-down-long"></i> Redução real na despesa mensal
                         </div>
 
-                        <!-- Detalhamento das duas faturas -->
                         <div class="mt-4 space-y-2.5 text-xs">
                             <div class="flex justify-between items-center p-2 rounded-lg bg-slate-950/50 border border-slate-800">
                                 <div>
@@ -332,7 +318,6 @@
 
                 </div>
 
-                <!-- HIGHLIGHT SAVINGS BANNER -->
                 <div class="glass-panel neon-card rounded-2xl p-6 border border-yellow-500/50 bg-gradient-to-r from-yellow-950/20 via-slate-900 to-emerald-950/20 relative">
                     <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
                         <div>
@@ -351,7 +336,6 @@
                     </div>
                 </div>
 
-                <!-- PROJECTION OVER TIME (Timeline Table/Cards) -->
                 <div class="glass-panel neon-card rounded-2xl p-6 border border-slate-800">
                     <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-4 flex items-center gap-2">
                         <i class="fa-solid fa-chart-line text-emerald-400"></i> Projeção de Acúmulo de Economia ao Longo do Tempo
@@ -377,7 +361,6 @@
                     </div>
                 </div>
 
-                <!-- EXPLANATORY CARD FOR CLIENT/SELLER -->
                 <div class="glass-panel rounded-2xl p-5 border border-slate-800 bg-slate-950/40">
                     <h4 class="text-xs font-bold text-slate-200 uppercase tracking-wider mb-2 flex items-center gap-1.5">
                         <i class="fa-solid fa-circle-info text-yellow-400"></i> Entenda a Regra Técnica do Desconto (ANEEL RN 1.000)
@@ -393,9 +376,15 @@
 
     </main>
 
-    <!-- JavaScript Logic -->
+    <!-- JavaScript Logic & PWA Service Worker Registration -->
     <script>
-        // Preset 1: Exemplo Monofásico (Sua Fatura Real)
+        // Registrar Service Worker para permitir instalação do PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js').catch(err => console.log('SW registration failed: ', err));
+            });
+        }
+
         function presetExemploNeudson() {
             document.querySelectorAll('input[name="tipoFornecimento"]')[0].checked = true;
             document.getElementById('tarifaKwhInput').value = "1.22989";
@@ -406,7 +395,6 @@
             calcularSimulacao();
         }
 
-        // Preset 2: Exemplo Trifásico (Fatura Sr. Antônio - Tarifa de R$ 1,16000)
         function presetExemploAntonio() {
             document.querySelectorAll('input[name="tipoFornecimento"]')[2].checked = true;
             document.getElementById('tarifaKwhInput').value = "1.16000";
@@ -423,15 +411,13 @@
         }
 
         function calcularSimulacao() {
-            // Inputs
             const tarifaKwh = parseFloat(document.getElementById('tarifaKwhInput').value) || 0;
             const consumoKwh = parseFloat(document.getElementById('consumoKwh').value) || 0;
             const taxaCip = parseFloat(document.getElementById('taxaCip').value) || 0;
             const pctDesconto = parseFloat(document.getElementById('pctDesconto').value) || 20;
 
-            // Radio Button - Minimum kWh retained by Concessionaire (Disponibilidade)
             const tipoFornecimentoEl = document.querySelector('input[name="tipoFornecimento"]:checked');
-            let kwhMinimo = 30; // Monofásico por padrão
+            let kwhMinimo = 30;
             let nomeTipo = "Monofásico";
 
             if (tipoFornecimentoEl) {
@@ -444,47 +430,35 @@
                 }
             }
 
-            // Fallback for edge cases
-            if (consumoKwh <= 0 || tarifaKwh <= 0) {
-                return;
-            }
+            if (consumoKwh <= 0 || tarifaKwh <= 0) return;
 
-            // 1. Calculate Gross Bill Scenario without discount
             const valorConsumoBruto = consumoKwh * tarifaKwh;
             const valorContaSemDesconto = valorConsumoBruto + taxaCip;
 
-            // 2. Calculate Compensated vs Retained kWh
             const kwhRetidoConcessionaria = Math.min(consumoKwh, kwhMinimo);
             const kwhCompensavel = Math.max(0, consumoKwh - kwhRetidoConcessionaria);
 
-            // 3. Values calculation
             const valorEnergiaCompensavelSemDesconto = kwhCompensavel * tarifaKwh;
             const valorEconomiaMensal = valorEnergiaCompensavelSemDesconto * (pctDesconto / 100);
             
-            // New Bills
             const novoBoletoCooperativa = valorEnergiaCompensavelSemDesconto - valorEconomiaMensal;
             const novaFaturaConcessionaria = (kwhRetidoConcessionaria * tarifaKwh) + taxaCip;
             const novoCustoTotalCombinado = novaFaturaConcessionaria + novoBoletoCooperativa;
 
-            // Global % Discount on the entire bill
             const pctRealGlobal = (valorContaSemDesconto > 0) ? ((valorContaSemDesconto - novoCustoTotalCombinado) / valorContaSemDesconto) * 100 : 0;
 
-            // Projections
             const economiaAnual = valorEconomiaMensal * 12;
             const economia3Anos = economiaAnual * 3;
             const economia5Anos = economiaAnual * 5;
             const economia10Anos = economiaAnual * 10;
 
-            // Formatter Helper
             const fmtR = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-            // DOM Updates - Current Scenario
             document.getElementById('resContaAntiga').innerText = fmtR(valorContaSemDesconto);
             document.getElementById('resConsumoTotal').innerText = consumoKwh + ' kWh';
             document.getElementById('resTarifaKwh').innerText = fmtR(tarifaKwh) + ' / kWh';
             document.getElementById('resTaxaAntiga').innerText = fmtR(taxaCip);
 
-            // DOM Updates - New Scenario
             document.getElementById('resNovoCustoTotal').innerText = fmtR(novoCustoTotalCombinado);
             document.getElementById('resFaturaConcessionaria').innerText = fmtR(novaFaturaConcessionaria);
             document.getElementById('resBoletoCooperativa').innerText = fmtR(novoBoletoCooperativa);
@@ -492,25 +466,21 @@
             document.getElementById('resMinimoLabel').innerText = `(${kwhRetidoConcessionaria} kWh retidos + CIP)`;
             document.getElementById('resCompensadoLabel').innerText = `(${kwhCompensavel} kWh com ${pctDesconto}% OFF)`;
 
-            // DOM Updates - Savings Banner
             document.getElementById('resEconomiaMensal').innerText = fmtR(valorEconomiaMensal);
             document.getElementById('resPctRealGlobal').innerText = pctRealGlobal.toFixed(1) + '%';
             document.getElementById('resEconomiaAnual').innerText = fmtR(economiaAnual);
 
-            // DOM Updates - Projections
             document.getElementById('proj1Ano').innerText = fmtR(economiaAnual);
             document.getElementById('proj3Anos').innerText = fmtR(economia3Anos);
             document.getElementById('proj5Anos').innerText = fmtR(economia5Anos);
             document.getElementById('proj10Anos').innerText = fmtR(economia10Anos);
 
-            // Technical Explanatory text update
             document.getElementById('explicacaoTecnica').innerHTML = `
                 Sua ligação é <strong>${nomeTipo}</strong>. A distribuidora de energia retém obrigatoriamente a taxa de disponibilidade de <strong>${kwhMinimo} kWh</strong> (${fmtR(kwhRetidoConcessionaria * tarifaKwh)}) mais a taxa de Iluminação Pública (${fmtR(taxaCip)}). 
                 O desconto de <strong>${pctDesconto}%</strong> é aplicado exclusivamente sobre a energia solar injetada pela cooperativa (<strong>${kwhCompensavel} kWh</strong>), gerando uma economia mensal líquida de <strong>${fmtR(valorEconomiaMensal)}</strong>.
             `;
         }
 
-        // Initialize on load
         window.onload = function() {
             calcularSimulacao();
         };
