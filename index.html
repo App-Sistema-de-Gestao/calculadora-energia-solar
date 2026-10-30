@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CALC. ENERGIA SOLAR POR ASSINATURA (Pro)</title>
+  <title>CALCULADORA (Pro)</title>
   
   <!-- PWA & Mobile Icons -->
   <link rel="icon" type="image/png" href="favicon.png">
@@ -14,7 +14,7 @@
   <!-- Tailwind CSS & Lucide Icons -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest"></script>
-  <!-- html2pdf for clean commercial PDF output -->
+  <!-- html2pdf para geração do PDF Comercial -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
@@ -24,14 +24,24 @@
       background-color: #0b0f17;
       color: #e2e8f0;
     }
-    .neon-border {
-      box-shadow: 0 0 15px rgba(6, 182, 212, 0.15);
+    
+    /* Efeito de Borda Amarelo Neon nos Cards (Hover & Touch) */
+    .card-neon-yellow {
+      transition: all 0.25s ease-in-out;
     }
-    .neon-border-active {
-      box-shadow: 0 0 20px rgba(6, 182, 212, 0.35);
-      border-color: #06b6d4 !important;
+    .card-neon-yellow:hover, .card-neon-yellow:active {
+      border-color: #facc15 !important;
+      box-shadow: 0 0 18px rgba(250, 204, 21, 0.25);
     }
-    /* Estilos do PDF Comercial */
+
+    /* Botão Selecionado Verde Neon (Monofásico / Trifásico) */
+    .btn-green-neon-active {
+      border-color: #22c55e !important;
+      background-color: rgba(34, 197, 94, 0.1) !important;
+      box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
+    }
+
+    /* Estilos Ocultos para Impressão de PDF */
     #pdf-template {
       display: none;
     }
@@ -51,12 +61,12 @@
   <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur-md sticky top-0 z-50 px-4 py-3">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
       <div class="flex items-center gap-3">
-        <div class="p-2 bg-cyan-500/10 text-cyan-400 rounded-lg border border-cyan-500/20">
+        <div class="p-2 bg-emerald-500/10 text-emerald-400 rounded-lg border border-emerald-500/20">
           <i data-lucide="zap" class="w-6 h-6"></i>
         </div>
         <div>
           <h1 class="font-bold text-lg text-slate-100 flex items-center gap-2">
-            CALC. ENERGIA SOLAR POR ASSINATURA 
+            CALCULADORA
             <span class="text-xs font-semibold px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded">Pro</span>
           </h1>
           <p class="text-xs text-slate-400">Simulador de Economia Líquida por Assinatura</p>
@@ -78,7 +88,7 @@
     
     <div class="text-center mb-8">
       <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-100 mb-2">
-        Calcule sua <span class="text-emerald-400">Economia Real</span> na Fatura
+        Calcule sua <span class="text-emerald-400">Economia Real</span>
       </h2>
       <p class="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto">
         Transparência total: veja exatamente o valor abatido do seu consumo e o saldo final combinando a concessionária e a cooperativa.
@@ -88,29 +98,29 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
       
       <!-- CARD 1: DADOS DA FATURA ATUAL (Esquerda) -->
-      <div class="lg:col-span-5 bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
+      <div class="lg:col-span-5 bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col justify-between card-neon-yellow">
         <div>
           <div class="flex justify-between items-center mb-5 pb-3 border-b border-slate-800">
             <h3 class="font-bold text-slate-200 text-sm flex items-center gap-2">
-              <i data-lucide="sliders" class="w-4 h-4 text-cyan-400"></i>
+              <i data-lucide="sliders" class="w-4 h-4 text-emerald-400"></i>
               Dados da Fatura Atual
             </h3>
-            <span class="text-[10px] text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20 font-medium">Etapa 1 de 2</span>
+            <span class="text-[10px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 font-medium">Etapa 1 de 2</span>
           </div>
 
           <!-- Tipo de Ligação -->
           <div class="mb-4">
             <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">TIPO DE LIGAÇÃO (CUSTO DE DISPONIBILIDADE)</label>
             <div class="grid grid-cols-2 gap-3">
-              <button id="btn-mono" onclick="setPadrao('monofasico')" class="p-3 text-left rounded-xl border border-slate-800 bg-slate-950/50 hover:bg-slate-800/50 transition">
+              <button id="btn-mono" onclick="setPadrao('monofasico')" class="p-3 text-left rounded-xl border border-slate-800 bg-slate-950/50 hover:border-emerald-500/50 transition">
                 <div class="flex items-center gap-2 text-xs font-bold text-slate-300 mb-1">
-                  <i data-lucide="home" class="w-3.5 h-3.5 text-cyan-400"></i> Monofásico
+                  <i data-lucide="home" class="w-3.5 h-3.5 text-emerald-400"></i> Monofásico
                 </div>
                 <div class="text-[10px] text-slate-500">Retém 30 kWh min</div>
               </button>
-              <button id="btn-tri" onclick="setPadrao('trifasico')" class="p-3 text-left rounded-xl border border-cyan-500/50 bg-slate-950/50 neon-border-active transition">
+              <button id="btn-tri" onclick="setPadrao('trifasico')" class="p-3 text-left rounded-xl border border-slate-800 bg-slate-950/50 btn-green-neon-active transition">
                 <div class="flex items-center gap-2 text-xs font-bold text-slate-200 mb-1">
-                  <i data-lucide="zap" class="w-3.5 h-3.5 text-amber-400"></i> Trifásico
+                  <i data-lucide="zap" class="w-3.5 h-3.5 text-emerald-400"></i> Trifásico
                 </div>
                 <div class="text-[10px] text-slate-400">Retém 100 kWh min</div>
               </button>
@@ -124,7 +134,7 @@
                 <span class="text-slate-300 font-medium">CONSUMO MENSAL (kWh)</span>
                 <span class="text-slate-500 text-[10px]">Medido na fatura</span>
               </div>
-              <input type="number" id="input-kwh" oninput="calculate()" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-lg px-3 py-2 text-sm text-slate-100 font-semibold focus:outline-none transition">
+              <input type="number" id="input-kwh" oninput="calculate()" class="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-lg px-3 py-2 text-sm text-slate-100 font-semibold focus:outline-none transition">
             </div>
 
             <div>
@@ -132,7 +142,7 @@
                 <span class="text-slate-300 font-medium">TARIFA DO kWh CONSUMO (R$)</span>
                 <span class="text-slate-500 text-[10px]">Tarifa Cheia com Impostos</span>
               </div>
-              <input type="number" step="0.00001" id="input-tarifa-consumo" oninput="calculate()" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-lg px-3 py-2 text-sm text-slate-100 font-semibold focus:outline-none transition">
+              <input type="number" step="0.00001" id="input-tarifa-consumo" oninput="calculate()" class="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-lg px-3 py-2 text-sm text-slate-100 font-semibold focus:outline-none transition">
             </div>
 
             <div>
@@ -140,7 +150,7 @@
                 <span class="text-slate-300 font-medium">TARIFA DA TAXA MÍNIMA (R$/kWh)</span>
                 <span class="text-slate-500 text-[10px]">Disponibilidade</span>
               </div>
-              <input type="number" step="0.00001" id="input-tarifa-minima" oninput="calculate()" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-lg px-3 py-2 text-sm text-slate-100 font-semibold focus:outline-none transition">
+              <input type="number" step="0.00001" id="input-tarifa-minima" oninput="calculate()" class="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-lg px-3 py-2 text-sm text-slate-100 font-semibold focus:outline-none transition">
             </div>
 
             <div>
@@ -148,7 +158,7 @@
                 <span class="text-slate-300 font-medium">CIP - ILUM PUB (R$)</span>
                 <span class="text-slate-500 text-[10px]">Não compensável</span>
               </div>
-              <input type="number" step="0.01" id="input-cip" oninput="calculate()" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-lg px-3 py-2 text-sm text-slate-100 font-semibold focus:outline-none transition">
+              <input type="number" step="0.01" id="input-cip" oninput="calculate()" class="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-lg px-3 py-2 text-sm text-slate-100 font-semibold focus:outline-none transition">
             </div>
 
             <div>
@@ -156,7 +166,7 @@
                 <span class="text-slate-300 font-medium">OUTROS ENCARGOS / BANDEIRAS / MULTAS / TAXAS (R$)</span>
                 <span class="text-emerald-400 text-[10px]">Ajustes Reais</span>
               </div>
-              <input type="number" step="0.01" id="input-outros" oninput="calculate()" class="w-full bg-slate-950 border border-slate-800 focus:border-cyan-500 rounded-lg px-3 py-2 text-sm text-slate-100 font-semibold focus:outline-none transition">
+              <input type="number" step="0.01" id="input-outros" oninput="calculate()" class="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500 rounded-lg px-3 py-2 text-sm text-slate-100 font-semibold focus:outline-none transition">
             </div>
 
             <!-- Slider Desconto -->
@@ -165,7 +175,7 @@
                 <span class="text-slate-300 font-medium">DESCONTO DA COOPERATIVA NO CONSUMO (%)</span>
                 <span id="label-desconto" class="text-emerald-400 font-bold bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">20%</span>
               </div>
-              <input type="range" id="input-desconto" min="5" max="30" value="20" oninput="calculate()" class="w-full accent-cyan-400 bg-slate-950 rounded-lg cursor-pointer">
+              <input type="range" id="input-desconto" min="5" max="30" value="20" oninput="calculate()" class="w-full accent-emerald-400 bg-slate-950 rounded-lg cursor-pointer">
             </div>
           </div>
         </div>
@@ -176,14 +186,14 @@
         </div>
       </div>
 
-      <!-- PAINEL DIREITO: RESULTADOS DA AUDITORIA E PROJEÇÃO -->
+      <!-- PAINEL DIREITO: RESULTADOS -->
       <div class="lg:col-span-7 space-y-6 flex flex-col justify-between">
         
-        <!-- CARDS DE CENÁRIOS COMPARATIVOS -->
+        <!-- CARDS COMPARATIVOS -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           
           <!-- CARD CENÁRIO ATUAL -->
-          <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl relative overflow-hidden">
+          <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl relative overflow-hidden card-neon-yellow">
             <div class="flex justify-between items-start mb-3">
               <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">CENÁRIO ATUAL</span>
               <i data-lucide="receipt" class="w-4 h-4 text-slate-500"></i>
@@ -212,12 +222,12 @@
           </div>
 
           <!-- CARD NOVO CUSTO COMBINADO -->
-          <div class="bg-slate-900/80 border border-cyan-500/30 rounded-2xl p-5 shadow-xl relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-900 to-cyan-950/20">
+          <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl relative overflow-hidden card-neon-yellow">
             <div class="flex justify-between items-start mb-3">
-              <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider">NOVO CUSTO COMBINADO</span>
+              <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider">NOVO CUSTO COMBINADO</span>
               <span class="text-[10px] font-bold bg-emerald-500/10 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/20">COM DESCONTO</span>
             </div>
-            <div id="display-novo-custo" class="text-2xl font-extrabold text-cyan-400 mb-1">R$ 0,00</div>
+            <div id="display-novo-custo" class="text-2xl font-extrabold text-emerald-400 mb-1">R$ 0,00</div>
             <div class="text-[11px] text-emerald-400 font-medium mb-4 flex items-center gap-1">
               <i data-lucide="arrow-down-right" class="w-3.5 h-3.5"></i> Redução real na despesa mensal
             </div>
@@ -244,7 +254,7 @@
         </div>
 
         <!-- CARD ECONOMIA LÍQUIDA HIGHLIGHT -->
-        <div class="bg-gradient-to-r from-emerald-950/40 via-slate-900 to-emerald-950/20 border border-emerald-500/30 rounded-2xl p-5 shadow-xl flex flex-col sm:flex-row justify-between items-center gap-4">
+        <div class="bg-gradient-to-r from-emerald-950/40 via-slate-900 to-emerald-950/20 border border-slate-800 rounded-2xl p-5 shadow-xl flex flex-col sm:flex-row justify-between items-center gap-4 card-neon-yellow">
           <div>
             <div class="flex items-center gap-2 text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">
               <i data-lucide="star" class="w-4 h-4 fill-amber-400"></i> ECONOMIA LÍQUIDA MENSAL
@@ -260,10 +270,10 @@
           </div>
         </div>
 
-        <!-- CARD PROJEÇÃO DE ACÚMULO DE ECONOMIA -->
-        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl">
+        <!-- CARD PROJEÇÃO DE ACÚMULO -->
+        <div class="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-xl card-neon-yellow">
           <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
-            <i data-lucide="trending-up" class="w-4 h-4 text-cyan-400"></i> Projeção de Acúmulo de Economia ao Longo do Tempo
+            <i data-lucide="trending-up" class="w-4 h-4 text-emerald-400"></i> Projeção de Acúmulo de Economia ao Longo do Tempo
           </h4>
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div class="p-3 bg-slate-950/50 rounded-xl border border-slate-800 text-center">
@@ -285,7 +295,7 @@
           </div>
         </div>
 
-        <!-- EXPLICAÇÃO TÉCNICA REGRAS ANEEL -->
+        <!-- EXPLICAÇÃO TÉCNICA -->
         <div class="p-4 bg-slate-900/40 border border-slate-800/80 rounded-xl text-xs text-slate-400 space-y-1">
           <div class="font-bold text-slate-300 flex items-center gap-1.5 mb-1">
             <i data-lucide="info" class="w-4 h-4 text-amber-400"></i> ENTENDA A REGRA TÉCNICA DO DESCONTO (ANEEL RN 1.000)
@@ -302,10 +312,10 @@
 
   <!-- Footer -->
   <footer class="border-t border-slate-800/80 py-4 px-4 text-center text-xs text-slate-500 mt-8">
-    <p>CALC. ENERGIA SOLAR POR ASSINATURA (Pro) • Sistema de Gestão Financeira Auditável</p>
+    <p>CALCULADORA (Pro) • Sistema de Gestão Financeira Auditável</p>
   </footer>
 
-  <!-- TEMPLATE OCULTO PARA IMPRESSÃO EM PDF EXECUTIVO (FORMATO OFICIAL PRINT 2) -->
+  <!-- TEMPLATE OCULTO PARA IMPRESSÃO EM PDF EXECUTIVO (PRINT 2) -->
   <div id="pdf-template">
     <div class="pdf-page" id="pdf-content">
       <!-- Header do PDF -->
@@ -421,14 +431,14 @@
       <!-- Condições e Rodapé -->
       <div style="border-top: 1px solid #e2e8f0; padding-top: 12px; text-align: center; font-size: 9px; color: #94a3b8; margin-top: 30px;">
         <p style="margin: 0 0 4px 0;"><strong>Condições:</strong> Adesão sem investimento em obras, sem fidelidade abusiva e sem taxas de manutenção. Sujeito à disponibilidade de saldo na cooperativa solar.</p>
-        <p style="margin: 0;">Gerado por <strong>CALC. ENERGIA SOLAR POR ASSINATURA (Pro)</strong></p>
+        <p style="margin: 0;">Gerado por <strong>CALCULADORA (Pro)</strong></p>
       </div>
     </div>
   </div>
 
   <!-- SCRIPT LÓGICO E INTERATIVO -->
   <script>
-    // Presets oficiais exigidos
+    // Presets oficiais das capturas fornecidas
     const PRESETS = {
       trifasico: {
         tipo: 'trifasico',
@@ -471,16 +481,16 @@
       document.getElementById('input-outros').value = data.outros;
       document.getElementById('input-desconto').value = data.desconto;
 
-      // Update UI active buttons
+      // Atualiza estado visual dos botões Verde Neon
       const btnMono = document.getElementById('btn-mono');
       const btnTri = document.getElementById('btn-tri');
 
       if (padrao === 'monofasico') {
-        btnMono.className = "p-3 text-left rounded-xl border border-cyan-500/50 bg-slate-950/50 neon-border-active transition";
-        btnTri.className = "p-3 text-left rounded-xl border border-slate-800 bg-slate-950/50 hover:bg-slate-800/50 transition";
+        btnMono.className = "p-3 text-left rounded-xl border btn-green-neon-active transition";
+        btnTri.className = "p-3 text-left rounded-xl border border-slate-800 bg-slate-950/50 hover:border-emerald-500/50 transition";
       } else {
-        btnTri.className = "p-3 text-left rounded-xl border border-cyan-500/50 bg-slate-950/50 neon-border-active transition";
-        btnMono.className = "p-3 text-left rounded-xl border border-slate-800 bg-slate-950/50 hover:bg-slate-800/50 transition";
+        btnTri.className = "p-3 text-left rounded-xl border btn-green-neon-active transition";
+        btnMono.className = "p-3 text-left rounded-xl border border-slate-800 bg-slate-950/50 hover:border-emerald-500/50 transition";
       }
 
       calculate();
